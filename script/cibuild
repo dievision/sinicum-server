@@ -1,0 +1,8 @@
+#!/bin/bash
+
+set -e
+
+# Java
+export PATH="$PATH:/usr/local/bin"
+mvn clean verify
+# mvn -f sinicum-server/pom-jcr1.xml clean test

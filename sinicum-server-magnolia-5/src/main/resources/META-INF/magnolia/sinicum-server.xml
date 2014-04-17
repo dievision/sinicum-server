@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module SYSTEM "module.dtd">
+<module>
+  <name>sinicum-server</name>
+  <displayName>Sinicum REST Interface</displayName>
+  <description>REST Interface to Jackrabbit Content</description>
+  <class>com.dievision.sinicum.server.magnolia.SinicumServerModule</class>
+  <versionHandler>com.dievision.sinicum.server.magnolia.VersionHandler</versionHandler>
+  <version>${project.version}</version>
+</module>
