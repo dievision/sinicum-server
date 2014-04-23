@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NodeResolver {
     private Session session;
+    private Node node;
     private String path;
     private String uuid;
     private String[] includeChildNodeTypes;
@@ -25,12 +26,35 @@ public class NodeResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(NodeResolver.class);
 
+    public NodeResolver(Node node) {
+        this.node = node;
+        if (node != null) {
+            try {
+                this.session = node.getSession();
+            } catch (RepositoryException e) {
+                // nothing
+            }
+        }
+    }
+
     public NodeResolver(Session session) {
         this.session = session;
     }
 
     public NodeApiWrapper getNode() throws RepositoryException, ItemNotFoundException,
             PathNotFoundException, AccessDeniedException {
+        if (node == null) {
+            node = resolveNode();
+        }
+        if (isMagnolia5Node(node)) {
+            return new NodeApiWrapper5(node, node.getPrimaryNodeType());
+        } else {
+            return new NodeApiWrapper4(node, node.getPrimaryNodeType());
+        }
+    }
+
+    private Node resolveNode() throws RepositoryException {
+        Node node = null;
         Item item;
         if (uuid == null) {
             item = this.session.getItem(path);
@@ -38,15 +62,11 @@ public class NodeResolver {
             item = this.session.getNodeByUUID(uuid);
         }
         if (item.isNode()) {
-            Node node = (Node) item;
-            if (isMagnolia5Node(node)) {
-                return new NodeApiWrapper5(node, node.getPrimaryNodeType());
-            } else {
-                return new NodeApiWrapper4(node, node.getPrimaryNodeType());
-            }
+            node = (Node) item;
         } else {
             throw new ItemNotFoundException("Item '" + path + "' is not a node.");
         }
+        return node;
     }
 
     public void setPath(String path) {

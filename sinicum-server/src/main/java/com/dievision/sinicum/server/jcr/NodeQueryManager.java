@@ -68,7 +68,8 @@ public class NodeQueryManager {
         List<NodeApiWrapper> nodes = new ArrayList<NodeApiWrapper>();
         while (result.hasNext()) {
             Node node = result.nextNode();
-            nodes.add(new NodeApiWrapper4(node, node.getPrimaryNodeType()));
+            NodeResolver nodeResolver = new NodeResolver(node);
+            nodes.add(nodeResolver.getNode());
         }
         return nodes;
     }
