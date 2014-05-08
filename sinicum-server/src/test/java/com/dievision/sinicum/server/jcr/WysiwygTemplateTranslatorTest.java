@@ -17,6 +17,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
     private Node page1;
     private Node page2;
     private Node dmsFile;
+    private Node damFile;
     private static final Logger logger =
             LoggerFactory.getLogger(WysiwygTemplateTranslatorTest.class);
 
@@ -30,6 +31,9 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         Session dmsSession = getJcrSession("dms");
         Node dmsRoot = dmsSession.getRootNode();
         dmsFile = dmsRoot.addNode("file", "mgnl:content");
+        Session damSession = getJcrSession("dam");
+        Node damRoot = damSession.getRootNode();
+        damFile = damRoot.addNode("file", "mgnl:content");
     }
 
     @Test
@@ -65,6 +69,16 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
                 + "End";
         WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
         assertEquals("Start /dmsfiles/default/file End", translator.translate(source));
+    }
+
+    @Test
+    public void testDamLink() throws RepositoryException {
+        String source = "Start ${link:{uuid:{" + damFile.getUUID() + "},"
+                + "repository:{" + damFile.getSession().getWorkspace().getName() + "},"
+                + "path:{" + damFile.getPath() + "},nodeData:{},extension:{html}}} "
+                + "End";
+        WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
+        assertEquals("Start /damfiles/default/file End", translator.translate(source));
     }
 
 }

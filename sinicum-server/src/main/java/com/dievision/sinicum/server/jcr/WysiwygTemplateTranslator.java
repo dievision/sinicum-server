@@ -26,6 +26,7 @@ public class WysiwygTemplateTranslator {
     private static final Pattern UUID_PATTERN = Pattern.compile(
             "\\$\\{link:.+?uuid:\\{(.*?)\\}.+?repository:\\{(.*?)\\}.*?\\}\\}\\}");
     private static final String DMS_PREFIX = "/dmsfiles/default";
+    private static final String DAM_PREFIX = "/damfiles/default";
     private static final Logger logger = LoggerFactory.getLogger(WysiwygTemplateTranslator.class);
 
 
@@ -57,8 +58,10 @@ public class WysiwygTemplateTranslator {
     }
 
     private String workspaceAdjustedPath(Node node) throws RepositoryException {
-        if ("dms".equals(node.getSession().getWorkspace().getName())) {
-            return DMS_PREFIX + node.getPath();
+        if ("dam".equals(node.getSession().getWorkspace().getName())) {
+            return DAM_PREFIX + node.getPath();
+        } else if ("dms".equals(node.getSession().getWorkspace().getName())) {
+                return DMS_PREFIX + node.getPath();
         } else {
             return node.getPath();
         }
