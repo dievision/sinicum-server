@@ -61,7 +61,7 @@ public class WysiwygTemplateTranslator {
         if ("dam".equals(node.getSession().getWorkspace().getName())) {
             return DAM_PREFIX + node.getPath();
         } else if ("dms".equals(node.getSession().getWorkspace().getName())) {
-                return DMS_PREFIX + node.getPath();
+            return DMS_PREFIX + node.getPath();
         } else {
             return node.getPath();
         }
