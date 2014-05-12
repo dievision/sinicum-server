@@ -8,6 +8,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +28,10 @@ public class WysiwygTemplateTranslator {
             "\\$\\{link:.+?uuid:\\{(.*?)\\}.+?repository:\\{(.*?)\\}.*?\\}\\}\\}");
     private static final String DMS_PREFIX = "/dmsfiles/default";
     private static final String DAM_PREFIX = "/damfiles/default";
+    private static final String JCR_CONTENT_PATH = "jcr:content";
+    private static final String EXTENSION_PROP = "extension";
+    private static final String FINGERPRINT_VERSION = "2";
+    private static final String FINGERPRINT_ALGORITHM = "MD5";
     private static final Logger logger = LoggerFactory.getLogger(WysiwygTemplateTranslator.class);
 
 
@@ -59,11 +64,41 @@ public class WysiwygTemplateTranslator {
 
     private String workspaceAdjustedPath(Node node) throws RepositoryException {
         if ("dam".equals(node.getSession().getWorkspace().getName())) {
-            return DAM_PREFIX + node.getPath();
+            return DAM_PREFIX + getDamPath(node);
         } else if ("dms".equals(node.getSession().getWorkspace().getName())) {
             return DMS_PREFIX + node.getPath();
         } else {
             return node.getPath();
         }
+    }
+
+    private String getDamPath(Node node) throws RepositoryException {
+        String path = node.getPath();
+        if (node.hasNode(JCR_CONTENT_PATH)) {
+            Node jcrContent = node.getNode(JCR_CONTENT_PATH);
+            String fingerprint = getFingerprint(node, jcrContent);
+            if (fingerprint != null) {
+                path += "-" + fingerprint;
+            }
+            if (jcrContent.hasProperty(EXTENSION_PROP)
+                    && !"".equals(jcrContent.getProperty(EXTENSION_PROP))) {
+                path += "." + jcrContent.getProperty(EXTENSION_PROP).getString();
+            }
+        }
+        return path;
+    }
+
+    private String getFingerprint(Node node, Node jcrContent) {
+        String fingerprint = null;
+        try {
+            String identifier = FINGERPRINT_VERSION + "-" + node.getPath() + "-" + node.getUUID()
+                    + jcrContent.getProperty("jcr:lastModified").getString() + "-"
+                    + jcrContent.getProperty("jcr:lastModifiedBy").getString() + "-"
+                    + jcrContent.getProperty("size").getString();
+            fingerprint = DigestUtils.md5Hex(identifier);
+        } catch (RepositoryException e) {
+            throw new RuntimeException(e);
+        }
+        return fingerprint;
     }
 }

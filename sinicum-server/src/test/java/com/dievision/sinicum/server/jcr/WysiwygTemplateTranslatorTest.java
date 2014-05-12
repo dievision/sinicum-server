@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.dievision.sinicum.server.JackrabbitTest45;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
     private Node page1;
@@ -34,6 +35,9 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         Session damSession = getJcrSession("dam");
         Node damRoot = damSession.getRootNode();
         damFile = damRoot.addNode("file", "mgnl:content");
+        Node damContent = damFile.addNode("jcr:content", "mgnl:resource");
+        damContent.setProperty("extension", "pdf");
+        damContent.setProperty("size", "12345");
     }
 
     @Test
@@ -78,7 +82,8 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
                 + "path:{" + damFile.getPath() + "},nodeData:{},extension:{html}}} "
                 + "End";
         WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
-        assertEquals("Start /damfiles/default/file End", translator.translate(source));
+        assertTrue(translator.translate(source).
+                matches("Start /damfiles/default/file-[a-f0-9]{32}.pdf End"));
     }
 
 }
