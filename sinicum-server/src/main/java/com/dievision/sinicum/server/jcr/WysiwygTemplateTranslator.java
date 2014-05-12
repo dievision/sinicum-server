@@ -97,7 +97,7 @@ public class WysiwygTemplateTranslator {
                     + jcrContent.getProperty("size").getString();
             fingerprint = DigestUtils.md5Hex(identifier);
         } catch (RepositoryException e) {
-            throw new RuntimeException(e);
+            logger.error("Could not create fingerprint: " + e.toString());
         }
         return fingerprint;
     }
