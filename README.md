@@ -1,6 +1,6 @@
 # Sinicum Server
 
-[![Build Status](https://magnum.travis-ci.com/dievision/sinicum-server.svg?token=gTyheAYAFCcFbV9J8ryk&branch=master)](https://magnum.travis-ci.com/dievision/sinicum-server)
+[![Build Status](https://travis-ci.org/dievision/sinicum-server.svg?branch=master)](https://travis-ci.org/dievision/sinicum-server)
 
 Sinicum Server is a Magnolia CMS Module that exposes [Magnolia
 CMS](http://www.magnolia-cms.com) Content via an HTTP REST interface
