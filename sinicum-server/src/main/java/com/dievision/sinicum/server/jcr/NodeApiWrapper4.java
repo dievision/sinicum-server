@@ -80,6 +80,8 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
         NodeIterator nodes = node.getNodes();
         while (nodes.hasNext()) {
             Node child = nodes.nextNode();
+            logger.debug("child " + child.getPrimaryNodeType().getName());
+            logger.debug("self  " + recursivePrimaryNodeType(node));
             if (!child.getPrimaryNodeType().getName().equals(recursivePrimaryNodeType(node))) {
                 nodeMap.put(child.getName(), createNodeApiWrapper(child, primaryNodeType));
             }
