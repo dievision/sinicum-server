@@ -3,6 +3,7 @@ package com.dievision.sinicum.server.jcr;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -77,6 +78,15 @@ public class NodeApiWrapper4Test extends JackrabbitTest45 {
         assertEquals("2014-07-03T22:00:00.000Z", date);
     }
 
+    @Test
+    public void testMultiValueNodes() throws Exception {
+        NodeApiWrapper wrapper = getWrapper(addMultiValueToHierarchy(setUpContentHierarchy()));
+        List<Object> result = (List<Object>) wrapper.getProperties().get("mutivalue");
+        assertEquals("value1", result.get(0));
+        assertEquals("value2", result.get(1));
+        assertEquals(2, result.size());
+    }
+
     private NodeApiWrapper getWrapper(Node node) throws IOException, RepositoryException {
         NodeApiWrapper nodeApiWrapper = new NodeApiWrapper4(node, node.getPrimaryNodeType());
         return nodeApiWrapper;
@@ -94,6 +104,11 @@ public class NodeApiWrapper4Test extends JackrabbitTest45 {
         Node childPage = node.addNode("company", "mgnl:page");
         childPage.setProperty("title", "A new property");
         session.save();
+        return node;
+    }
+
+    private Node addMultiValueToHierarchy(Node node) throws RepositoryException {
+        node.setProperty("mutivalue", new String[]{"value1", "value2"});
         return node;
     }
 

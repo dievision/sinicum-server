@@ -1,6 +1,8 @@
 package com.dievision.sinicum.server.jcr;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jcr.Node;
@@ -9,6 +11,7 @@ import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
 import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
 
 import org.slf4j.Logger;
@@ -53,25 +56,45 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
             Property prop = properties.nextProperty();
             String propertyName = prop.getName();
             if (includePropertyInProperties(propertyName)) {
-                int type = prop.getType();
-                if (type == PropertyType.STRING) {
-                    propertyMap.put(prop.getName(), translator.translate(prop.getString()));
-                } else if (type == PropertyType.DOUBLE) {
-                    propertyMap.put(propertyName, prop.getDouble());
-                } else if (type == PropertyType.LONG) {
-                    propertyMap.put(propertyName, prop.getLong());
-                } else if (type == PropertyType.BOOLEAN) {
-                    propertyMap.put(propertyName, prop.getBoolean());
-                } else if (type == PropertyType.DATE) {
-                    propertyMap.put(propertyName, prop.getString());
-                } else if (type == PropertyType.BINARY) {
-                    propertyMap.put(propertyName, "Binary Data Type not supported");
-                } else if (!prop.getDefinition().isMultiple()) {
-                    propertyMap.put(propertyName, prop.getString());
+                Object propertyValue;
+                if (!prop.isMultiple()) {
+                    propertyValue = resolvePropertyTypes(prop.getValue());
+                } else {
+                    propertyValue = resolveMultiplePropertyTypes(prop.getValues());
                 }
+                propertyMap.put(propertyName, propertyValue);
             }
         }
         return propertyMap;
+    }
+
+    private Object resolveMultiplePropertyTypes(Value[] values) throws RepositoryException {
+        List<Object> result = new ArrayList<Object>(values.length);
+        for (Value value : values) {
+            result.add(resolvePropertyTypes(value));
+        }
+        return result;
+    }
+
+    private Object resolvePropertyTypes(Value value) throws RepositoryException {
+        int type = value.getType();
+        Object result;
+        if (type == PropertyType.STRING) {
+            result = translator.translate(value.getString());
+        } else if (type == PropertyType.DOUBLE) {
+            result = value.getDouble();
+        } else if (type == PropertyType.LONG) {
+            result = value.getLong();
+        } else if (type == PropertyType.BOOLEAN) {
+            result = value.getBoolean();
+        } else if (type == PropertyType.DATE) {
+            result = value.getString();
+        } else if (type == PropertyType.BINARY) {
+            result = "Binary Data Type not supported";
+        } else {
+            result = value.getString();
+        }
+        return result;
     }
 
     @Override
