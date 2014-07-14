@@ -7,7 +7,6 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
-import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
 import javax.jcr.nodetype.NodeType;
 
@@ -20,7 +19,7 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
     private final Node node;
     private final NodeType primaryNodeType;
     private final String[] includeChildNodeTypes;
-    private final WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
+    private final PropertyToJsonTypeTranslator translator = new PropertyToJsonTypeTranslator();
 
     protected static final String[] MGNL4_META_JCR_PROPERTIES = {"jcr:uuid", "jcr:primaryType",
         "mixinTypes", "jcr:mixinTypes", "jcr:created", "jcr:createdBy"};
@@ -53,22 +52,7 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
             Property prop = properties.nextProperty();
             String propertyName = prop.getName();
             if (includePropertyInProperties(propertyName)) {
-                int type = prop.getType();
-                if (type == PropertyType.STRING) {
-                    propertyMap.put(prop.getName(), translator.translate(prop.getString()));
-                } else if (type == PropertyType.DOUBLE) {
-                    propertyMap.put(propertyName, prop.getDouble());
-                } else if (type == PropertyType.LONG) {
-                    propertyMap.put(propertyName, prop.getLong());
-                } else if (type == PropertyType.BOOLEAN) {
-                    propertyMap.put(propertyName, prop.getBoolean());
-                } else if (type == PropertyType.DATE) {
-                    propertyMap.put(propertyName, prop.getString());
-                } else if (type == PropertyType.BINARY) {
-                    propertyMap.put(propertyName, "Binary Data Type not supported");
-                } else if (!prop.getDefinition().isMultiple()) {
-                    propertyMap.put(propertyName, prop.getString());
-                }
+                propertyMap.put(propertyName, translator.resolvePropertyToJsonType(prop));
             }
         }
         return propertyMap;
