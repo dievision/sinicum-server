@@ -1,17 +1,13 @@
 package com.dievision.sinicum.server.jcr;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Property;
 import javax.jcr.PropertyIterator;
-import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
-import javax.jcr.Value;
 import javax.jcr.nodetype.NodeType;
 
 import org.slf4j.Logger;
@@ -23,7 +19,7 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
     private final Node node;
     private final NodeType primaryNodeType;
     private final String[] includeChildNodeTypes;
-    private final WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
+    private final PropertyToJsonTypeTranslator translator = new PropertyToJsonTypeTranslator();
 
     protected static final String[] MGNL4_META_JCR_PROPERTIES = {"jcr:uuid", "jcr:primaryType",
         "mixinTypes", "jcr:mixinTypes", "jcr:created", "jcr:createdBy"};
@@ -56,45 +52,10 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
             Property prop = properties.nextProperty();
             String propertyName = prop.getName();
             if (includePropertyInProperties(propertyName)) {
-                Object propertyValue;
-                if (!prop.isMultiple()) {
-                    propertyValue = resolvePropertyTypes(prop.getValue());
-                } else {
-                    propertyValue = resolveMultiplePropertyTypes(prop.getValues());
-                }
-                propertyMap.put(propertyName, propertyValue);
+                propertyMap.put(propertyName, translator.resolvePropertyToJsonType(prop));
             }
         }
         return propertyMap;
-    }
-
-    private Object resolveMultiplePropertyTypes(Value[] values) throws RepositoryException {
-        List<Object> result = new ArrayList<Object>(values.length);
-        for (Value value : values) {
-            result.add(resolvePropertyTypes(value));
-        }
-        return result;
-    }
-
-    private Object resolvePropertyTypes(Value value) throws RepositoryException {
-        int type = value.getType();
-        Object result;
-        if (type == PropertyType.STRING) {
-            result = translator.translate(value.getString());
-        } else if (type == PropertyType.DOUBLE) {
-            result = value.getDouble();
-        } else if (type == PropertyType.LONG) {
-            result = value.getLong();
-        } else if (type == PropertyType.BOOLEAN) {
-            result = value.getBoolean();
-        } else if (type == PropertyType.DATE) {
-            result = value.getString();
-        } else if (type == PropertyType.BINARY) {
-            result = "Binary Data Type not supported";
-        } else {
-            result = value.getString();
-        }
-        return result;
     }
 
     @Override
