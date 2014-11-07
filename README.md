@@ -71,7 +71,7 @@ authorization rules apply.
 
 ### Making a request
 
-By default, Sinicum Server all Sinicum Server requests have the path
+By default, all Sinicum Server requests have the path
 prefix `sinicum-rest`.
 
 You can access the API e.g. via
