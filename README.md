@@ -72,15 +72,15 @@ authorization rules apply.
 ### Making a request
 
 By default, Sinicum Server all Sinicum Server requests have the path
-prefix `sinicum-server`.
+prefix `sinicum-rest`.
 
 You can access the API e.g. via
 
-    curl -u username:password https://localhost:8080/sinicum-server/website/path
+    curl -u username:password https://localhost:8080/sinicum-rest/website/path
 
 All requests return JSON by default. You can obtain pretty output by
 setting the `pretty` request parameter to `true`,
-e.g. `/sinicum-server/website/path?pretty=true`.
+e.g. `/sinicum-rest/website/path?pretty=true`.
 
 
 ### Accessing Magnolia CMS content
