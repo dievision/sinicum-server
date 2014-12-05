@@ -27,7 +27,7 @@ include the following dependency:
 <dependency>
   <groupId>com.dievision.sinicum</groupId>
   <artifactId>sinicum-server-magnolia-5</artifactId>
-  <version>0.9.2</version>
+  <version>0.9.3</version>
 </dependency>
 ```
 
