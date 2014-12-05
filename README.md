@@ -37,7 +37,7 @@ the list of your repositories:
 ```xml
 <repositories>
   <repository>
-    <id>maven.dievision.de.snapshots</id>
+    <id>maven.dievision.de.releases</id>
     <name>Dievision Maven Repository</name>
     <url>https://mvn-dievision.s3.amazonaws.com/release</url>
   </repository>
