@@ -88,12 +88,18 @@ public class WysiwygTemplateTranslator {
         return path;
     }
 
-    private String getFingerprint(Node node, Node jcrContent) {
+    private String getFingerprint(Node node, Node jcrContent) throws RepositoryException {
         String fingerprint = null;
+        String lastModified = null;
+        if ("dam".equals(node.getSession().getWorkspace().getName())) {
+            lastModified = "mgnl:lastModified";
+        } else {
+            lastModified = "jcr:lastModified";
+        }
         try {
             String identifier = FINGERPRINT_VERSION + "-" + node.getPath() + "-" + node.getUUID()
-                    + jcrContent.getProperty("jcr:lastModified").getString() + "-"
-                    + jcrContent.getProperty("jcr:lastModifiedBy").getString() + "-"
+                    + jcrContent.getProperty(lastModified).getString() + "-"
+                    + jcrContent.getProperty(lastModified + "By").getString() + " - "
                     + jcrContent.getProperty("size").getString();
             fingerprint = DigestUtils.md5Hex(identifier);
         } catch (RepositoryException e) {
