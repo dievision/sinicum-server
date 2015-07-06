@@ -99,7 +99,7 @@ public class WysiwygTemplateTranslator {
         try {
             String identifier = FINGERPRINT_VERSION + "-" + node.getPath() + "-" + node.getUUID()
                     + jcrContent.getProperty(lastModified).getString() + "-"
-                    + jcrContent.getProperty(lastModified + "By").getString() + " - "
+                    + jcrContent.getProperty(lastModified + "By").getString() + "-"
                     + jcrContent.getProperty("size").getString();
             fingerprint = DigestUtils.md5Hex(identifier);
         } catch (RepositoryException e) {
