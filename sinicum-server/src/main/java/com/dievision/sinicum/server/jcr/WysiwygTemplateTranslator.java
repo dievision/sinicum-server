@@ -91,7 +91,7 @@ public class WysiwygTemplateTranslator {
     private String getFingerprint(Node node, Node jcrContent) throws RepositoryException {
         String fingerprint = null;
         String lastModified = null;
-        if ("dam".equals(node.getSession().getWorkspace().getName())) {
+        if (jcrContent.hasProperty("mgnl:lastModified")) {
             lastModified = "mgnl:lastModified";
         } else {
             lastModified = "jcr:lastModified";
