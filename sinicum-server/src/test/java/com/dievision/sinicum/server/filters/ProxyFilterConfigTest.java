@@ -12,7 +12,7 @@ public class ProxyFilterConfigTest {
 
     @Test
     public void testDefaultPattern() {
-        assertTrue(ProxyFilterConfig.getInstance().matchesPath("/"));
+        assertTrue(ProxyFilterConfig.getInstance().matchesPath("/.*"));
         assertTrue(ProxyFilterConfig.getInstance().matchesPath("/something"));
     }
 
