@@ -68,6 +68,54 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
         }
     }
 
+    @Test
+    public void testCaseInsensivityXPath() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, "xPath",
+                2, 2);
+        assertEquals(Query.XPATH, nodeQueryManager.getLanguage());
+
+    }
+
+    @Test
+    public void testCaseInsensivitySql() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, "sQl",
+                2, 2);
+        assertEquals(Query.SQL, nodeQueryManager.getLanguage());
+
+    }
+
+    @Test
+    public void testCaseInsensivityJcrSql2() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, "jcR-Sql2",
+                2, 2);
+        assertEquals(Query.JCR_SQL2, nodeQueryManager.getLanguage());
+
+    }
+
+    @Test
+    public void testCaseInsensivityJqm() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, "jcR-JqOm",
+                2, 2);
+        assertEquals(Query.JCR_JQOM, nodeQueryManager.getLanguage());
+
+    }
+
+    @Test
+    public void testCaseInsensivityNull() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, null,
+                2, 2);
+        assertEquals(null, nodeQueryManager.getLanguage());
+
+    }
+
+    @Test
+    public void testCaseInsensivitySomethingElse() {
+        NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, "someThing",
+                2, 2);
+        assertEquals("someThing", nodeQueryManager.getLanguage());
+
+    }
+
     private List<NodeApiWrapper> getAllNodes() throws RepositoryException {
         NodeQueryManager nodeQueryManager = new NodeQueryManager("config", QUERY, Query.XPATH);
         return nodeQueryManager.executeQuery();

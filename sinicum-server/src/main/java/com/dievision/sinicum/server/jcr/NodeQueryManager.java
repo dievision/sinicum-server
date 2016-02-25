@@ -40,7 +40,7 @@ public class NodeQueryManager {
                             long limit, long offset) {
         this.workspace = workspace;
         this.query = query;
-        this.language = language;
+        this.language = convertQueryLanguage(language);
         this.limit = limit;
         this.offset = offset;
     }
@@ -87,6 +87,24 @@ public class NodeQueryManager {
             return checkMethod;
         } catch (IntrospectionException e) {
             return false;
+        }
+    }
+
+    protected String getLanguage() {
+        return language;
+    }
+
+    private String convertQueryLanguage(String queryLanguage) {
+        if (Query.XPATH.equalsIgnoreCase(queryLanguage)) {
+            return Query.XPATH;
+        } else if (Query.SQL.equalsIgnoreCase(queryLanguage)) {
+            return Query.SQL;
+        } else if (Query.JCR_SQL2.equalsIgnoreCase(queryLanguage)) {
+            return Query.JCR_SQL2;
+        } else if (Query.JCR_JQOM.equalsIgnoreCase(queryLanguage)) {
+            return Query.JCR_JQOM;
+        } else {
+            return queryLanguage;
         }
     }
 }
