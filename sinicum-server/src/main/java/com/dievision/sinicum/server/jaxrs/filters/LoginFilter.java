@@ -1,12 +1,14 @@
 package com.dievision.sinicum.server.jaxrs.filters;
 
+import java.io.IOException;
+
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
 import javax.xml.bind.DatatypeConverter;
 
+import org.glassfish.jersey.server.ContainerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
 
 import com.dievision.sinicum.server.jaxrs.NotAllowedException;
 import com.dievision.sinicum.server.mgnlAdapters.MgnlContextAdapter;
@@ -15,20 +17,12 @@ import com.dievision.sinicum.server.mgnlAdapters.SecurityAdapter;
 public class LoginFilter implements ContainerRequestFilter {
     private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
-    @Override
-    public ContainerRequest filter(ContainerRequest request) {
-        // String[] credentials = getCredentials(request);
-        // try {
-        //     performLogin(credentials[0], credentials[1]);
-        // } catch (LoginException e) {
-        //     throw new NotAllowedException("Invalid credentials.");
-        // }
+    public void filter(ContainerRequestContext requestContext) throws IOException {
         MgnlContextAdapter.login(SecurityAdapter.getSystemSubject());
-        return request;
     }
 
     private String[] getCredentials(ContainerRequest request) {
-        String auth = request.getHeaderValue("authorization");
+        String auth = request.getHeaderString("authorization");
         if (auth == null) {
             throw new NotAllowedException("No authentication given");
         }

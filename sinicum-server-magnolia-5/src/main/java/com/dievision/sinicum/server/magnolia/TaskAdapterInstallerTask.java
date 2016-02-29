@@ -23,17 +23,14 @@ public class TaskAdapterInstallerTask implements Task {
         taskAdapter.setServerConfiguration(new ServerConfigurationAdapter5());
     }
 
-    @Override
     public String getName() {
         return taskAdapter.getName();
     }
 
-    @Override
     public String getDescription() {
         return taskAdapter.getDescription();
     }
 
-    @Override
     public void execute(InstallContext installContext) throws TaskExecutionException {
         try {
             taskAdapter.execute(installContext.getConfigJCRSession());

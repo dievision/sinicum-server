@@ -33,18 +33,15 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
         this.includeChildNodeTypes = includeChildNodeTypes;
     }
 
-    @Override
     @JsonIgnore
     public Node getNode() {
         return this.node;
     }
 
-    @Override
     public NodeApiWrapperMeta getMeta() {
         return new NodeApiWrapper4Meta(node);
     }
 
-    @Override
     public Map<String, Object> getProperties() throws RepositoryException {
         Map<String, Object> propertyMap = new LinkedHashMap<String, Object>();
         PropertyIterator properties = node.getProperties();
@@ -58,7 +55,6 @@ public class NodeApiWrapper4 implements NodeApiWrapper {
         return propertyMap;
     }
 
-    @Override
     public Map<String, Object> getNodes() throws RepositoryException {
         Map<String, Object> nodeMap = new LinkedHashMap<String, Object>();
         NodeIterator nodes = node.getNodes();

@@ -25,17 +25,14 @@ public class SinicumTemplateRendererInstallTask extends AbstractInstallTask {
     private static final Logger logger =
             LoggerFactory.getLogger(SinicumTemplateRendererInstallTask.class);
 
-    @Override
     public String getName() {
         return "Sinicum Template Renderer Install Task";
     }
 
-    @Override
     public String getDescription() {
         return "Installs a dummy template renderer";
     }
 
-    @Override
     public void execute(Session session) throws TaskAdapterExecutionException {
         try {
             if (isPost44(session)) {

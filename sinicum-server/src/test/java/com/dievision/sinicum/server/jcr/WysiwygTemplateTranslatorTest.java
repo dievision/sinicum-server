@@ -42,7 +42,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
 
     @Test
     public void testUuidBasedLink() throws RepositoryException {
-        String source = "Start ${link:{uuid:{" + page1.getUUID() + "},"
+        String source = "Start ${link:{uuid:{" + page1.getIdentifier() + "},"
                 + "repository:{" + page1.getSession().getWorkspace().getName() + "},"
                 + "handle:{" + page1.getPath() + "},nodeData:{},extension:{html}}} "
                 + "End";
@@ -52,11 +52,11 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
 
     @Test
     public void testMultiReplacement() throws RepositoryException {
-        String source = "Start ${link:{uuid:{" + page1.getUUID() + "},"
+        String source = "Start ${link:{uuid:{" + page1.getIdentifier() + "},"
                 + "repository:{" + page1.getSession().getWorkspace().getName() + "},"
                 + "handle:{" + page1.getPath() + "},nodeData:{},extension:{html}}} "
                 + "in between "
-                + "${link:{uuid:{" + page2.getUUID() + "},"
+                + "${link:{uuid:{" + page2.getIdentifier() + "},"
                 + "repository:{" + page2.getSession().getWorkspace().getName() + "},"
                 + "handle:{" + page2.getPath() + "},nodeData:{},extension:{html}}} "
                 + "End";
@@ -67,7 +67,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
 
     @Test
     public void testDmsLink() throws RepositoryException {
-        String source = "Start ${link:{uuid:{" + dmsFile.getUUID() + "},"
+        String source = "Start ${link:{uuid:{" + dmsFile.getIdentifier() + "},"
                 + "repository:{" + dmsFile.getSession().getWorkspace().getName() + "},"
                 + "handle:{" + dmsFile.getPath() + "},nodeData:{},extension:{html}}} "
                 + "End";
@@ -77,7 +77,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
 
     @Test
     public void testDamLink() throws RepositoryException {
-        String source = "Start ${link:{uuid:{" + damFile.getUUID() + "},"
+        String source = "Start ${link:{uuid:{" + damFile.getIdentifier() + "},"
                 + "repository:{" + damFile.getSession().getWorkspace().getName() + "},"
                 + "path:{" + damFile.getPath() + "},nodeData:{},extension:{html}}} "
                 + "End";

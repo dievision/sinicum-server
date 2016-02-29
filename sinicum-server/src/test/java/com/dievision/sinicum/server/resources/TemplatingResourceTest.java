@@ -6,17 +6,20 @@ import java.util.Map;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
+
+import com.dievision.sinicum.server.resources.providers.SinicumObjectProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,50 +28,47 @@ public class TemplatingResourceTest extends JerseyJackrabbitTest {
     private Node page;
     private static final Logger logger = LoggerFactory.getLogger(TemplatingResourceTest.class);
 
+    @Override
+    protected Application configure() {
+        return new ResourceConfig(
+                SinicumObjectProvider.class,
+                TemplatingResource.class
+        );
+    }
+
     @Test
     public void testComponentsForPage() {
-        WebResource ws = resource().path(
-                "/_templating/components/myModule/homepage/main")
-                .queryParam("pretty", "true");
-        ClientResponse response = ws.accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(ClientResponse.class);
+        Response response = target("/_templating/components/myModule/homepage/main")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
         assertEquals(200, response.getStatus());
-        Map map = response.getEntity(Map.class);
+        Map map = response.readEntity(Map.class);
         assertEquals("myModule:components/teaser", ((List) map.get("components")).get(0));
     }
 
     @Test
     public void testDialogsForComponent() {
-        WebResource ws = resource().path(
-                "/_templating/dialogs/page/myModule/homepage")
-                .queryParam("pretty", "true");
-        ClientResponse response = ws.accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(ClientResponse.class);
+        Response response = target("/_templating/dialogs/page/myModule/homepage")
+                .request(MediaType.APPLICATION_JSON)
+                .get();
         assertEquals(200, response.getStatus());
-        Map map = response.getEntity(Map.class);
+        Map map = response.readEntity(Map.class);
         assertEquals("myModule:pageProperties", map.get("dialog"));
     }
 
     @Test
     public void testAreaInitializer() throws RepositoryException {
-        try {
-            WebResource ws = resource().path(
-                    "/_templating/areas/initialize")
-                    .queryParam("pretty", "true");
+        Form form = new Form();
+        form.param("workspace", "website");
+        form.param("baseNodeUuid", page.getIdentifier());
+        form.param("areaName", "main");
 
-            MultivaluedMap<String, String> formData = new Form();
-            formData.add("workspace", "website");
-            formData.add("baseNodeUuid", page.getUUID());
-            formData.add("areaName", "main");
-
-            ClientResponse response = ws.accept(MediaType.APPLICATION_JSON_TYPE)
-                    .post(ClientResponse.class, formData);
-            assertEquals(200, response.getStatus());
-            Map map = response.getEntity(Map.class);
-            assertTrue((Boolean) map.get("areaCreated"));
-        } catch (Exception e) {
-            logger.error(e.toString(), e);
-        }
+        Response response = target("/_templating/areas/initialize")
+                .request(MediaType.APPLICATION_JSON)
+                .post(Entity.form(form));
+        assertEquals(200, response.getStatus());
+        Map map = response.readEntity(Map.class);
+        assertTrue((Boolean) map.get("areaCreated"));
     }
 
     /**
@@ -126,7 +126,7 @@ public class TemplatingResourceTest extends JerseyJackrabbitTest {
         // subTeaser component definition
         components.addNode("subTeaser", "mgnl:contentNode");
 
-        rootNode.save();
+        session.save();
     }
 
     /**
@@ -141,6 +141,6 @@ public class TemplatingResourceTest extends JerseyJackrabbitTest {
         page = rootNode.addNode("page", "mgnl:page");
         Node metaData = page.getNode("MetaData");
         metaData.setProperty("mgnl:template", "myModule:pages/homepage");
-        rootNode.save();
+        session.save();
     }
 }

@@ -40,7 +40,8 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
                     2);
             List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
             assertEquals(2, result.size());
-            assertEquals(allNodes.get(0).getNode().getUUID(), result.get(0).getNode().getUUID());
+            assertEquals(allNodes.get(0).getNode().getIdentifier(),
+                    result.get(0).getNode().getIdentifier());
         }
     }
 
@@ -52,7 +53,8 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
                     0, 1);
             List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
             assertEquals(allNodes.size() - 1, result.size());
-            assertEquals(allNodes.get(1).getNode().getUUID(), result.get(0).getNode().getUUID());
+            assertEquals(allNodes.get(1).getNode().getIdentifier(),
+                    result.get(0).getNode().getIdentifier());
         }
     }
 
@@ -64,7 +66,8 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
                     2, 2);
             List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
             assertEquals(2, result.size());
-            assertEquals(allNodes.get(2).getNode().getUUID(), result.get(0).getNode().getUUID());
+            assertEquals(allNodes.get(2).getNode().getIdentifier(),
+                    result.get(0).getNode().getIdentifier());
         }
     }
 

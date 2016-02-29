@@ -124,9 +124,8 @@ public class NodeResource {
             Item item = getSession(workspace).getItem("/" + path);
             if (item != null && item.isNode()) {
                 Node node = (Node) item;
-                final InputStream stream = node.getProperty(property).getStream();
+                final InputStream stream = node.getProperty(property).getBinary().getStream();
                 StreamingOutput streamingOutput = new StreamingOutput() {
-                    @Override
                     public void write(OutputStream output) throws IOException {
                         byte[] buffer = new byte[4096];
                         int read;

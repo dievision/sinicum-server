@@ -20,36 +20,30 @@ public class NodeApiWrapper4Meta implements NodeApiWrapperMeta {
         this.node = node;
     }
 
-    @Override
     public String getWorkspace() throws RepositoryException {
         return node.getSession().getWorkspace().getName();
     }
 
-    @Override
     public String getJcrUuid() throws RepositoryException {
         String uuid = null;
         if (node.isNodeType(MIX_REFERENCABLE)) {
-            uuid = node.getUUID();
+            uuid = node.getIdentifier();
         }
         return uuid;
     }
 
-    @Override
     public String getPath() throws RepositoryException {
         return node.getPath();
     }
 
-    @Override
     public String getName() throws RepositoryException {
         return node.getName();
     }
 
-    @Override
     public String getJcrPrimaryType() throws RepositoryException {
         return node.getPrimaryNodeType().getName();
     }
 
-    @Override
     public List<String> getSuperTypes() throws RepositoryException {
         List<String> types = new ArrayList<String>();
         for (NodeType superType : node.getPrimaryNodeType().getSupertypes()) {
@@ -58,12 +52,10 @@ public class NodeApiWrapper4Meta implements NodeApiWrapperMeta {
         return types;
     }
 
-    @Override
     public int getDepth() throws RepositoryException {
         return node.getDepth();
     }
 
-    @Override
     public String getJcrCreated() throws RepositoryException {
         String created = null;
         if (node.hasProperty("jcr:created")) {
@@ -72,7 +64,6 @@ public class NodeApiWrapper4Meta implements NodeApiWrapperMeta {
         return created;
     }
 
-    @Override
     public List<String> getMixinNodeTypes() throws RepositoryException {
         List<String> mixinTypes = new ArrayList<String>();
         for (NodeType nodeType : node.getMixinNodeTypes()) {

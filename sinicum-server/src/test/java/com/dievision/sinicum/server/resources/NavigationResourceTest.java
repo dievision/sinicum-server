@@ -6,15 +6,16 @@ import java.util.Map;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
+import com.dievision.sinicum.server.resources.providers.SinicumObjectProvider;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -24,6 +25,14 @@ public class NavigationResourceTest extends JerseyJackrabbitTest {
     private Node node0;
     private Node node010;
     private static final Logger logger = LoggerFactory.getLogger(NavigationResourceTest.class);
+
+    @Override
+    protected Application configure() {
+        return new ResourceConfig(
+                SinicumObjectProvider.class,
+                NavigationResource.class
+        );
+    }
 
     @Before
     public void setUpRepository() throws RepositoryException {
@@ -42,22 +51,9 @@ public class NavigationResourceTest extends JerseyJackrabbitTest {
     }
 
     @Test
-    public void testSuccess() throws RepositoryException {
-        ClientResponse response = sendRequest("/" + node0.getUUID());
-        assertEquals(200, response.getStatus());
-    }
-
-    @Test
-    public void testSuccessWithPath() throws RepositoryException {
-        ClientResponse response = sendRequest(node0.getPath());
-        assertEquals(200, response.getStatus());
-    }
-
-    @Test
     public void testElementWithProperties() throws RepositoryException {
-        ClientResponse response = sendRequest("/" + node0.getUUID());
-        List result = response.getEntity(List.class);
-        Map map = (Map) result.get(0);
+        List response = sendRequest("/" + node0.getIdentifier());
+        Map map = (Map) response.get(0);
         assertEquals("/0/00", map.get("path"));
         assertTrue(map.containsKey("uuid"));
 
@@ -70,40 +66,34 @@ public class NavigationResourceTest extends JerseyJackrabbitTest {
     }
 
     @Test
-    public void testParentDirectionResponse() throws RepositoryException {
-        ClientResponse response = sendParentRequest(node010.getPath());
-        String res = response.getEntity(String.class);
-        assertEquals(200, response.getStatus());
-    }
-
-    @Test
     public void testParentDirectionResponseFormat() throws RepositoryException {
-        ClientResponse response = sendParentRequest(node010.getPath());
-        List list = response.getEntity(List.class);
-        assertEquals(3, list.size());
-        Map element = (Map) list.get(0);
+        List response = sendParentRequest(node010.getPath());
+        assertEquals(3, response.size());
+        Map element = (Map) response.get(0);
         assertTrue(element.containsKey("path"));
         assertTrue(element.containsKey("uuid"));
         assertTrue(element.containsKey("depth"));
         assertTrue(element.containsKey("properties"));
     }
 
-    private ClientResponse sendRequest(String nodePath) throws RepositoryException {
-        WebResource ws = resource().path(
-                "/_navigation/children" + nodePath)
+    private List sendRequest(String nodePath) throws RepositoryException {
+        List result = target("/_navigation/children" + nodePath)
                 .queryParam("properties", "title;nav_title")
                 .queryParam("depth", "1")
-                .queryParam("pretty", "true");
-        return ws.accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(ClientResponse.class);
+                .queryParam("pretty", "true")
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get(List.class);
+        return result;
     }
 
-    private ClientResponse sendParentRequest(String nodePath) throws RepositoryException {
-        WebResource ws = resource().path(
-                "/_navigation/parents" + nodePath)
+    private List sendParentRequest(String nodePath) throws RepositoryException {
+        List result = target("/_navigation/parents" + nodePath)
                 .queryParam("properties", "title;nav_title")
-                .queryParam("pretty", "true");
-        return ws.accept(MediaType.APPLICATION_JSON_TYPE)
-                .get(ClientResponse.class);
+                .queryParam("pretty", "true")
+                .request()
+                .accept(MediaType.APPLICATION_JSON)
+                .get(List.class);
+        return result;
     }
 }

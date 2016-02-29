@@ -4,18 +4,15 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import info.magnolia.module.InstallContext;
 import info.magnolia.module.delta.Task;
 import info.magnolia.module.delta.TaskExecutionException;
 
-import com.dievision.sinicum.server.jaxrs.filters.LoginFilter;
-import com.dievision.sinicum.server.jaxrs.filters.PrettyPrintFilter;
-import com.dievision.sinicum.server.jaxrs.filters.TimingResponseFilter;
+import com.dievision.sinicum.server.SinciumServerApplication;
 
 public class SinicumRestServletInstallTask implements Task {
     private Session session;
@@ -27,17 +24,14 @@ public class SinicumRestServletInstallTask implements Task {
     private static final Logger logger =
             LoggerFactory.getLogger(SinicumRestServletInstallTask.class);
 
-    @Override
     public String getName() {
         return "Sinicum Rest Servlet Installer";
     }
 
-    @Override
     public String getDescription() {
         return "Installs the Sinicum REST servlet";
     }
 
-    @Override
     public void execute(InstallContext installContext) throws TaskExecutionException {
         try {
             this.session = installContext.getConfigJCRSession();
@@ -83,17 +77,8 @@ public class SinicumRestServletInstallTask implements Task {
 
     private void createParameters(Node servletNode) throws RepositoryException {
         Node parameters = servletNode.addNode("parameters", "mgnl:contentNode");
-        parameters.setProperty("com.sun.jersey.config.property.packages",
-                "com.dievision.sinicum.server.resources");
-        parameters.setProperty("com.sun.jersey.spi.container.ContainerRequestFilters",
-                TimingResponseFilter.class.getName() + ";"
-                        + LoginFilter.class.getName() + ";"
-                        + PrettyPrintFilter.class.getName() + ";"
-                        + GZIPContentEncodingFilter.class.getName()
-        );
-        parameters.setProperty("com.sun.jersey.spi.container.ContainerResponseFilters",
-                GZIPContentEncodingFilter.class.getName() + ";"
-                        + TimingResponseFilter.class.getName());
+        parameters.setProperty("javax.ws.rs.Application",
+                SinciumServerApplication.class.getName());
     }
 
     private Node findOrCreateFilterNode() {

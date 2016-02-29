@@ -42,7 +42,7 @@ public class ParentNavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testCorrectSizeOfElements() throws RepositoryException {
-        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getUUID(),
+        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getIdentifier(),
                 Arrays.asList("title"));
         List<NavigationElement> elements = provider.getNavigationElements();
         assertEquals(3, elements.size());
@@ -50,7 +50,7 @@ public class ParentNavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testCorrectElements() throws RepositoryException {
-        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getUUID(),
+        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getIdentifier(),
                 Arrays.asList("title"));
         List<NavigationElement> elements = provider.getNavigationElements();
         assertEquals(node0.getPath(), elements.get(0).getPath());
@@ -60,7 +60,7 @@ public class ParentNavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testCorrectProperties() throws RepositoryException {
-        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getUUID(),
+        ParentNavigationProvider provider = new ParentNavigationProvider(node010.getIdentifier(),
                 Arrays.asList("title"));
         List<NavigationElement> elements = provider.getNavigationElements();
         NavigationElement element = elements.get(1);

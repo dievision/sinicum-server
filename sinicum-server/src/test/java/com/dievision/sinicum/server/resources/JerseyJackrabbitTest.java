@@ -1,7 +1,9 @@
 package com.dievision.sinicum.server.resources;
 
 import javax.jcr.Session;
+import javax.ws.rs.core.Application;
 
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -9,9 +11,7 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+
 
 import com.dievision.sinicum.server.JackrabbitTestDelegator;
 import com.dievision.sinicum.server.JackrabbitTestDelegator45;
@@ -21,12 +21,12 @@ public abstract class JerseyJackrabbitTest extends JerseyTest {
     private static final Logger logger = LoggerFactory.getLogger(JerseyJackrabbitTest.class);
 
     public JerseyJackrabbitTest() {
-        super(new WebAppDescriptor.Builder("com.dievision.sinicum.server.resources")
-                .servletClass(ServletContainer.class)
-                .initParam("com.sun.jersey.spi.container.ContainerRequestFilters",
-                        "com.dievision.sinicum.server.jaxrs.filters.PrettyPrintFilter")
-                .build());
         delegator = new JackrabbitTestDelegator45();
+    }
+
+    @Override
+    protected Application configure() {
+        return super.configure();
     }
 
     @BeforeClass
