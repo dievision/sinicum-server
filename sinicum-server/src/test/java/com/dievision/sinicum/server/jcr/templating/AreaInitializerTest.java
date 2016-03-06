@@ -26,13 +26,13 @@ public class AreaInitializerTest extends JackrabbitTest45 {
 
     @Test
     public void testFindPageToNode() throws RepositoryException {
-        AreaInitializer initializer = new AreaInitializer("website", page.getUUID(), "main");
-        assertEquals(mainArea.getUUID(), initializer.getAreaNode().getUUID());
+        AreaInitializer initializer = new AreaInitializer("website", page.getIdentifier(), "main");
+        assertEquals(mainArea.getIdentifier(), initializer.getAreaNode().getIdentifier());
     }
 
     @Test
     public void testFindAvailableComponents() throws RepositoryException {
-        AreaInitializer initializer = new AreaInitializer("website", page.getUUID(), "main");
+        AreaInitializer initializer = new AreaInitializer("website", page.getIdentifier(), "main");
         List<String> results = new ArrayList<String>();
         results.add("myModule:components/teaser");
         assertEquals(results, initializer.lookupAvailableComponents());
@@ -42,7 +42,8 @@ public class AreaInitializerTest extends JackrabbitTest45 {
     public void testAreaCreated() throws RepositoryException {
         Session session = getJcrSession("website");
         assertFalse(session.getRootNode().hasNode("page/main"));
-        AreaInitializer initializer = new AreaInitializer("website", page.getUUID(), "main");
+        AreaInitializer initializer = new AreaInitializer("website", page.getIdentifier(),
+                "main");
         Node subArea = session.getRootNode().getNode("page/main");
         assertEquals("mgnl:area", subArea.getPrimaryNodeType().getName());
     }
@@ -50,14 +51,16 @@ public class AreaInitializerTest extends JackrabbitTest45 {
     @Test
     public void testFindSubArea() throws RepositoryException {
         setUpArea();
-        AreaInitializer initializer = new AreaInitializer("website", teaser.getUUID(), "subArea");
+        AreaInitializer initializer = new AreaInitializer("website", teaser.getIdentifier(),
+                "subArea");
         assertEquals(subArea.getPath(), initializer.getAreaNode().getPath());
     }
 
     @Test
     public void testFindAvailableComponentsForSubArea() throws RepositoryException {
         setUpArea();
-        AreaInitializer initializer = new AreaInitializer("website", teaser.getUUID(), "subArea");
+        AreaInitializer initializer = new AreaInitializer("website", teaser.getIdentifier(),
+                "subArea");
         List<String> results = new ArrayList<String>();
         results.add("myModule:components/subTeaser");
         assertEquals(results, initializer.lookupAvailableComponents());
@@ -68,7 +71,8 @@ public class AreaInitializerTest extends JackrabbitTest45 {
         setUpArea();
         Session session = getJcrSession("website");
         assertFalse(session.getRootNode().hasNode("page/main/0/subArea"));
-        AreaInitializer initializer = new AreaInitializer("website", teaser.getUUID(), "subArea");
+        AreaInitializer initializer = new AreaInitializer("website", teaser.getIdentifier(),
+                "subArea");
         Node subArea = session.getRootNode().getNode("page/main/0/subArea");
         assertEquals("mgnl:area", subArea.getPrimaryNodeType().getName());
     }
@@ -128,7 +132,7 @@ public class AreaInitializerTest extends JackrabbitTest45 {
         // subTeaser component definition
         components.addNode("subTeaser", "mgnl:contentNode");
 
-        rootNode.save();
+        session.save();
     }
 
     /**
@@ -143,7 +147,7 @@ public class AreaInitializerTest extends JackrabbitTest45 {
         page = rootNode.addNode("page", "mgnl:page");
         Node metaData = page.getNode("MetaData");
         metaData.setProperty("mgnl:template", "myModule:pages/homepage");
-        rootNode.save();
+        session.save();
     }
 
     /**

@@ -24,17 +24,14 @@ public class SinicumProxyFilterInstallTask extends AbstractInstallTask {
     private static final Logger logger =
             LoggerFactory.getLogger(SinicumProxyFilterInstallTask.class);
 
-    @Override
     public String getName() {
         return "SinicumProxyFilter Install Task";
     }
 
-    @Override
     public String getDescription() {
         return "Installs the Sinicum Proxy Filter";
     }
 
-    @Override
     public void execute(Session configSession) throws TaskAdapterExecutionException {
         try {
             installSinicumProxyFilter(configSession);

@@ -24,7 +24,6 @@ public class SinicumObjectProvider implements ContextResolver<ObjectMapper> {
         this.prettyPrintObjectMapper = createPrettyPrintObjectMapper();
     }
 
-    @Override
     public ObjectMapper getContext(Class<?> type) {
         if (PrettyPrintContext.getInstance().getPrettyPrint()) {
             return prettyPrintObjectMapper;

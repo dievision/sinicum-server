@@ -59,7 +59,7 @@ public class NodeResolver {
         if (uuid == null) {
             item = this.session.getItem(path);
         } else {
-            item = this.session.getNodeByUUID(uuid);
+            item = this.session.getNodeByIdentifier(uuid);
         }
         if (item.isNode()) {
             node = (Node) item;

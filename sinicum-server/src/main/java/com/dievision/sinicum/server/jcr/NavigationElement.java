@@ -37,7 +37,7 @@ public class NavigationElement {
     public String getUuid() {
         String result = null;
         try {
-            result = node.getUUID();
+            result = node.getIdentifier();
         } catch (RepositoryException e) {
             logger.error("Could not resolve UUID: " + e.toString());
         }

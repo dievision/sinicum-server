@@ -34,7 +34,7 @@ public class DialogResolverTest extends JackrabbitTest45 {
         Node compontents = templates.addNode("components", "mgnl:content");
         Node pageProperties = modules.addNode("pageProperties", "mgnl:content");
 
-        rootNode.save();
+        session.save();
     }
 
     @Test

@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.dievision.sinicum</groupId>
     <artifactId>sinicum-server-parent</artifactId>
-    <version>0.9.5</version>
+    <version>0.10.0</version>
   </parent>
 
   <artifactId>sinicum-server</artifactId>
@@ -17,59 +17,33 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jacksonVersion>2.1.4</jacksonVersion>
-    <jerseyVersion>1.18.1</jerseyVersion>
+    <jacksonVersion>2.7.2</jacksonVersion>
+    <jerseyVersion>2.22.2</jerseyVersion>
   </properties>
 
 
   <dependencies>
     <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-server</artifactId>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>${jerseyVersion}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.containers</groupId>
+        <artifactId>jersey-container-servlet</artifactId>
+        <version>${jerseyVersion}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.glassfish.jersey.media</groupId>
+        <artifactId>jersey-media-json-jackson</artifactId>
         <version>${jerseyVersion}</version>
     </dependency>
 
     <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-servlet</artifactId>
+        <groupId>org.glassfish.jersey.test-framework.providers</groupId>
+        <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
         <version>${jerseyVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sun.jersey.jersey-test-framework</groupId>
-      <artifactId>jersey-test-framework-grizzly2</artifactId>
-      <version>${jerseyVersion}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jacksonVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jacksonVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jacksonVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.jaxrs</groupId>
-      <artifactId>jackson-jaxrs-json-provider</artifactId>
-      <version>${jacksonVersion}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-yaml</artifactId>
-      <version>${jacksonVersion}</version>
+        <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -206,7 +180,7 @@
       </snapshots>
     </repository>
     <!-- IF YOU NEED MODULES FROM THE ENTERPRISE VERSION, UNCOMMENT THE FOLLOWING REPOSITORY -->
-    <!--             tt
+    <!--
     <repository>
       <id>magnolia.enterprise.releases</id>
       <url>https://nexus.magnolia-cms.com/content/repositories/magnolia.enterprise.releases</url>

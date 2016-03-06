@@ -30,7 +30,6 @@ public abstract class AbstractInstallTask implements TaskAdapter {
         return exists;
     }
 
-    @Override
     public void setServerConfiguration(ServerConfigurationAdapter serverConfigurationAdapter) {
         this.serverConfigurationAdapter = serverConfigurationAdapter;
     }

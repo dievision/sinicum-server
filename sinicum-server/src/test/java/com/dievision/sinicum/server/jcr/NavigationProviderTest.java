@@ -38,7 +38,7 @@ public class NavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testOneLevelNavigationUuidBase() throws RepositoryException {
-        NavigationProvider provider = new NavigationProvider(node0.getUUID(),
+        NavigationProvider provider = new NavigationProvider(node0.getIdentifier(),
                 Arrays.asList("title"), 1);
         List<NavigationElement> elements = provider.getNavigationElements();
         assertEquals(2, elements.size());
@@ -54,7 +54,7 @@ public class NavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testReturnsCorrectNodes() throws RepositoryException {
-        NavigationProvider provider = new NavigationProvider(node0.getUUID(),
+        NavigationProvider provider = new NavigationProvider(node0.getIdentifier(),
                 Arrays.asList("title"), 1);
         List<NavigationElement> elements = provider.getNavigationElements();
         assertEquals("/0/00", elements.get(0).getPath());
@@ -63,7 +63,7 @@ public class NavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testReturnsNoChildNodes() throws RepositoryException {
-        NavigationProvider provider = new NavigationProvider(node0.getUUID(),
+        NavigationProvider provider = new NavigationProvider(node0.getIdentifier(),
                 Arrays.asList("title"), 1);
         List<NavigationElement> elements = provider.getNavigationElements();
         assertNull(elements.get(0).getChildren());
@@ -71,7 +71,7 @@ public class NavigationProviderTest extends JackrabbitTest45 {
 
     @Test
     public void testReturnsMultipleLevels() throws RepositoryException {
-        NavigationProvider provider = new NavigationProvider(node0.getUUID(),
+        NavigationProvider provider = new NavigationProvider(node0.getIdentifier(),
                 Arrays.asList("title"), 2);
         List<NavigationElement> elements = provider.getNavigationElements();
         assertEquals("/0/00", elements.get(0).getPath());

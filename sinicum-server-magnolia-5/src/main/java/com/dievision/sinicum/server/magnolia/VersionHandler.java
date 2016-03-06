@@ -8,12 +8,17 @@ import org.slf4j.LoggerFactory;
 
 import info.magnolia.module.DefaultModuleVersionHandler;
 import info.magnolia.module.InstallContext;
+import info.magnolia.module.delta.DeltaBuilder;
 import info.magnolia.module.delta.Task;
 
 import com.dievision.sinicum.server.mgnlAdapters.TaskAdapter;
 
 public class VersionHandler extends DefaultModuleVersionHandler {
     private static final Logger logger = LoggerFactory.getLogger(VersionHandler.class);
+
+    public VersionHandler() {
+        registerUpdateHandlers();
+    }
 
     @Override
     protected List<Task> getExtraInstallTasks(InstallContext installContext) {
@@ -31,5 +36,10 @@ public class VersionHandler extends DefaultModuleVersionHandler {
         }
         taskList.add(new SinicumRestServletInstallTask());
         return taskList;
+    }
+
+    private void registerUpdateHandlers() {
+        register(DeltaBuilder.update("0.10.0", "Update to Jersey 2.x")
+                .addTask(new Jersey2xUpdateTask()));
     }
 }

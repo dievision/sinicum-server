@@ -68,7 +68,7 @@ public class AreaInitializer {
         try {
             Node baseNode = null;
             try {
-                baseNode = getSession().getNodeByUUID(baseNodeUuid);
+                baseNode = getSession().getNodeByIdentifier(baseNodeUuid);
             } catch (ItemNotFoundException e) {
                 // nothing
             }
@@ -123,7 +123,7 @@ public class AreaInitializer {
         try {
             Node rootNode = getSession().getRootNode();
             try {
-                Node pageNode = getSession().getNodeByUUID(baseNodeUuid);
+                Node pageNode = getSession().getNodeByIdentifier(baseNodeUuid);
                 while (!isPageOrComponent(pageNode) && !pageNode.equals(rootNode)) {
                     pageNode = pageNode.getParent();
                 }

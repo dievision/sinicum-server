@@ -19,18 +19,15 @@ public class AllowMultipleHttpMethodsTask extends AbstractInstallTask {
     private static final Logger logger = LoggerFactory.getLogger(
             AllowMultipleHttpMethodsTask.class);
 
-    @Override
     public String getName() {
         return "Allow multiple HTTP Methods";
     }
 
-    @Override
     public String getDescription() {
         return "Configures Magnolia's IP configuration to allow the GET, POST, PUT, PATCH and "
                 + "DELETE HTTP methods";
     }
 
-    @Override
     public void execute(Session configSession) throws TaskAdapterExecutionException {
         try {
             allowAllHttpMethods(configSession);
@@ -46,7 +43,7 @@ public class AllowMultipleHttpMethodsTask extends AbstractInstallTask {
             if (ipConfigNode.hasProperty("methods")
                     && !ALLOW_VALUES.equals(ipConfigNode.getProperty("methods").getString())) {
                 ipConfigNode.setProperty("methods", ALLOW_VALUES);
-                ipConfigNode.getParent().save();
+                ipConfigNode.getSession().save();
             }
         }
     }

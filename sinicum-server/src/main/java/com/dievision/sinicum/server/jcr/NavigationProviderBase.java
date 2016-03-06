@@ -36,7 +36,7 @@ public abstract class NavigationProviderBase {
         try {
             // test for UUID format
             UUID.fromString(baseNodeUuidOrPath);
-            result = getSession().getNodeByUUID(baseNodeUuidOrPath);
+            result = getSession().getNodeByIdentifier(baseNodeUuidOrPath);
         } catch (Exception e) {
             // else try by path
             result = getSession().getRootNode().getNode(baseNodeUuidOrPath);
