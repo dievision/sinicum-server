@@ -154,7 +154,7 @@ public class ProxyFilter {
             // Pass the response code. This method with the "reason phrase" is deprecated but it's
             // the only way to pass the reason along too.
             // noinspection deprecation
-            response.sendError(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
+            response.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
 
             copyResponseHeaders(proxyResponse, response);
 
