@@ -3,16 +3,18 @@ package com.dievision.sinicum.server.jcr;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dievision.sinicum.server.mgnlAdapters.MgnlContextAdapter;
+
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.NodeIterator;
 
 /**
  * <p>Translates the Freemarker-based links to other nodes created by the WYSIWYG editor to
@@ -68,7 +70,7 @@ public class WysiwygTemplateTranslator {
         } else if ("dms".equals(node.getSession().getWorkspace().getName())) {
             return DMS_PREFIX + node.getPath();
         } else {
-            return node.getPath();
+            return multisiteAwarePath(node.getPath());
         }
     }
 
@@ -106,5 +108,22 @@ public class WysiwygTemplateTranslator {
             logger.error("Could not create fingerprint: " + e.toString());
         }
         return fingerprint;
+    }
+
+    private String multisiteAwarePath(String path) throws RepositoryException {
+        NodeIterator it = getMultisiteNodeIterator();
+        while (it.hasNext()) {
+            Node multisiteNode = it.nextNode();
+            if (multisiteNode.hasProperty("root_node")
+                    && path.startsWith(multisiteNode.getProperty("root_node").getString())) {
+                path = path.replaceAll(multisiteNode.getProperty("root_node").getString(), "");
+            }
+        }
+        return path;
+    }
+
+    private NodeIterator getMultisiteNodeIterator() throws RepositoryException {
+        Session session = MgnlContextAdapter.getJcrSession("multisite");
+        return session.getRootNode().getNodes();
     }
 }

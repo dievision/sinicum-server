@@ -17,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
     private Node page1;
     private Node page2;
+    private Node page3;
     private Node dmsFile;
     private Node damFile;
     private static final Logger logger =
@@ -28,6 +29,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         Node root = session.getRootNode();
         page1 = root.addNode("my-node", "mgnl:content");
         page2 = page1.addNode("subnode", "mgnl:content");
+        page3 = root.addNode("en-GB", "mgnl:page").addNode("nice-subpage", "mgnl:page");
         session.save();
         Session dmsSession = getJcrSession("dms");
         Node dmsRoot = dmsSession.getRootNode();
@@ -38,6 +40,12 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         Node damContent = damFile.addNode("jcr:content", "mgnl:resource");
         damContent.setProperty("extension", "pdf");
         damContent.setProperty("size", "12345");
+
+        session = getJcrSession("multisite");
+        root = session.getRootNode();
+        Node multisiteNode = root.addNode("en-gb", "mgnl:content");
+        multisiteNode.setProperty("root_node", "/en-GB");
+        session.save();
     }
 
     @Test
@@ -84,6 +92,17 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
         assertTrue(translator.translate(source).
                 matches("Start /damfiles/default/file-[a-f0-9]{32}.pdf End"));
+    }
+
+    @Test
+    public void testMultisiteLink() throws RepositoryException {
+        assertEquals("/en-GB/nice-subpage", page3.getPath());
+        String source = "Start ${link:{uuid:{" + page3.getIdentifier() + "},"
+                + "repository:{" + page3.getSession().getWorkspace().getName() + "},"
+                + "handle:{" + page3.getPath() + "},nodeData:{},extension:{html}}} "
+                + "End";
+        WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
+        assertEquals("Start /nice-subpage End", translator.translate(source));
     }
 
 }
