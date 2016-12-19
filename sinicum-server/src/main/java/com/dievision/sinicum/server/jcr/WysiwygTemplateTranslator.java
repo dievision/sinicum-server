@@ -41,7 +41,6 @@ public class WysiwygTemplateTranslator {
             new ThreadLocal<ArrayList<String>>() {
                 @Override
                 protected ArrayList<String> initialValue() {
-                    System.out.println("Sinicum-Server DEBUG::: Creating the list");
                     ArrayList<String> list = new ArrayList<String>();
                     Session session = null;
                     try {
