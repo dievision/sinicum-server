@@ -1,5 +1,6 @@
 package com.dievision.sinicum.server.jcr;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.NodeIterator;
+
 
 /**
  * <p>Translates the Freemarker-based links to other nodes created by the WYSIWYG editor to
@@ -35,6 +37,28 @@ public class WysiwygTemplateTranslator {
     private static final String FINGERPRINT_VERSION = "2";
     private static final String FINGERPRINT_ALGORITHM = "MD5";
     private static final Logger logger = LoggerFactory.getLogger(WysiwygTemplateTranslator.class);
+    private static final ThreadLocal<ArrayList<String>> MULTISITE_NODES =
+            new ThreadLocal<ArrayList<String>>() {
+                @Override
+                protected ArrayList<String> initialValue() {
+                    System.out.println("Sinicum-Server DEBUG::: Creating the list");
+                    ArrayList<String> list = new ArrayList<String>();
+                    Session session = null;
+                    try {
+                        session = MgnlContextAdapter.getJcrSession("multisite");
+                        NodeIterator it = session.getRootNode().getNodes();
+                        while (it.hasNext()) {
+                            Node node = it.nextNode();
+                            if (node.hasProperty("root_node")) {
+                                list.add(node.getProperty("root_node").getString());
+                            }
+                        }
+                    } catch (RepositoryException e) {
+                        e.printStackTrace();
+                    }
+                    return list;
+                }
+            };
 
 
     public String translate(String source) {
@@ -111,19 +135,9 @@ public class WysiwygTemplateTranslator {
     }
 
     private String multisiteAwarePath(String path) throws RepositoryException {
-        NodeIterator it = getMultisiteNodeIterator();
-        while (it.hasNext()) {
-            Node multisiteNode = it.nextNode();
-            if (multisiteNode.hasProperty("root_node")
-                    && path.startsWith(multisiteNode.getProperty("root_node").getString())) {
-                path = path.replaceAll(multisiteNode.getProperty("root_node").getString(), "");
-            }
+        for (String rootNode : MULTISITE_NODES.get()) {
+            path = path.replaceAll(rootNode, "");
         }
         return path;
-    }
-
-    private NodeIterator getMultisiteNodeIterator() throws RepositoryException {
-        Session session = MgnlContextAdapter.getJcrSession("multisite");
-        return session.getRootNode().getNodes();
     }
 }
