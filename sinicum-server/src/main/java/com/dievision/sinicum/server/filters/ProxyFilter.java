@@ -132,7 +132,8 @@ public class ProxyFilter {
         }
 
         copyRequestHeaders(request, proxyRequest);
-        setMagnoliaHeaders(proxyRequest);
+        addProtocolHeaders(proxyRequest);
+        addMagnoliaHeaders(proxyRequest);
 
         HttpClient proxyClient = createNewClient();
         try {
@@ -189,10 +190,22 @@ public class ProxyFilter {
         return client;
     }
 
-    private void setMagnoliaHeaders(HttpRequest proxyRequest) {
+    private void addProtocolHeaders(HttpRequest proxyRequest) {
+        if (isSecureProxyRequest(proxyRequest)) {
+            proxyRequest.addHeader("X-Forwarded-Proto", "https");
+        }
+    }
+
+    private void addMagnoliaHeaders(HttpRequest proxyRequest) {
         proxyRequest.addHeader("X-Mgnl-Admin", "true");
         proxyRequest.addHeader("X-Mgnl-Preview",
                 Boolean.toString(aggregationStateAdapter.isPreviewMode()));
+    }
+
+    private boolean isSecureProxyRequest(HttpRequest proxyRequest) {
+        return proxyRequest.getRequestLine() != null
+                && proxyRequest.getRequestLine().getUri() != null
+                && proxyRequest.getRequestLine().getUri().startsWith("https://");
     }
 
     private boolean doResponseRedirectOrNotModifiedLogic(HttpServletRequest servletRequest,
@@ -266,6 +279,9 @@ public class ProxyFilter {
                 continue;
             }
             if (HOP_BY_HOP_HEADERS.containsHeader(headerName)) {
+                continue;
+            }
+            if ("X-Forwarded-Proto".equalsIgnoreCase(headerName)) {
                 continue;
             }
             // As per the Java Servlet API 2.5 documentation:

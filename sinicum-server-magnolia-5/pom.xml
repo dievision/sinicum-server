@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.dievision.sinicum</groupId>
     <artifactId>sinicum-server-parent</artifactId>
-    <version>0.10.0</version>
+    <version>0.10.1</version>
   </parent>
 
   <artifactId>sinicum-server-magnolia-5</artifactId>
@@ -105,19 +105,6 @@
       </extension>
     </extensions>
   </build>
-
-  <distributionManagement>
-    <repository>
-      <id>maven-dievision-s3-release-repo</id>
-      <name>Dievision S3 Release Repository</name>
-      <url>s3://mvn-dievision/release</url>
-    </repository>
-    <snapshotRepository>
-      <id>maven-dievision-s3-snapshot-repo</id>
-      <name>Dievision S3 Snapshot Repository</name>
-      <url>s3://mvn-dievision/snapshot</url>
-    </snapshotRepository>
-  </distributionManagement>
 
   <repositories>
     <repository>

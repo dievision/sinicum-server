@@ -4,7 +4,7 @@
 
   <groupId>com.dievision.sinicum</groupId>
   <artifactId>sinicum-server-parent</artifactId>
-  <version>0.10.0</version>
+  <version>0.10.1</version>
   <packaging>pom</packaging>
 
   <name>sinicum-server-parent</name>
@@ -82,14 +82,14 @@
 
   <distributionManagement>
     <repository>
-      <id>maven-dievision-s3-release-repo</id>
-      <name>Dievision S3 Release Repository</name>
-      <url>s3://mvn-dievision/release</url>
+      <id>dievision.nexus</id>
+      <name>Dievision Nexus</name>
+      <url>https://nexus.dievision.de/repository/dievision-public-releases/</url>
     </repository>
     <snapshotRepository>
-      <id>maven-dievision-s3-snapshot-repo</id>
-      <name>Dievision S3 Snapshot Repository</name>
-      <url>s3://mvn-dievision/snapshot</url>
+      <id>dievision.nexus.snapshots</id>
+      <name>Dievision Nexus Snapshots</name>
+      <url>https://nexus.dievision.de/repository/dievision-public-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
 
@@ -101,15 +101,5 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-    <!-- IF YOU NEED MODULES FROM THE ENTERPRISE VERSION, UNCOMMENT THE FOLLOWING REPOSITORY -->
-    <!--             tt
-    <repository>
-      <id>magnolia.enterprise.releases</id>
-      <url>https://nexus.magnolia-cms.com/content/repositories/magnolia.enterprise.releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    -->
   </repositories>
 </project>
