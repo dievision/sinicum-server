@@ -1,9 +1,5 @@
 package com.dievision.sinicum.server.jcr;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.MethodDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
