@@ -4,7 +4,6 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.MethodDescriptor;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,12 +52,10 @@ public class NodeQueryManager {
         if (limitAndOffsetSupported()) {
             try {
                 if (limit > 0) {
-                    Method m = qry.getClass().getDeclaredMethod("setLimit", Long.TYPE);
-                    m.invoke(qry, limit);
+                    qry.setLimit(limit);
                 }
                 if (offset > 0) {
-                    Method m = qry.getClass().getDeclaredMethod("setOffset", Long.TYPE);
-                    m.invoke(qry, offset);
+                    qry.setOffset(offset);
                 }
             } catch (Exception e) {
                 logger.error("Could not set limit or offset for query: " + e.toString());
