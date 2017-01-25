@@ -49,17 +49,11 @@ public class NodeQueryManager {
         QueryManager queryManager = session.getWorkspace().getQueryManager();
         Query qry = queryManager.createQuery(query, language);
 
-        if (limitAndOffsetSupported()) {
-            try {
-                if (limit > 0) {
-                    qry.setLimit(limit);
-                }
-                if (offset > 0) {
-                    qry.setOffset(offset);
-                }
-            } catch (Exception e) {
-                logger.error("Could not set limit or offset for query: " + e.toString());
-            }
+        if (limit > 0) {
+            qry.setLimit(limit);
+        }
+        if (offset > 0) {
+            qry.setOffset(offset);
         }
         NodeIterator result = qry.execute().getNodes();
         List<NodeApiWrapper> nodes = new ArrayList<NodeApiWrapper>();
@@ -69,22 +63,6 @@ public class NodeQueryManager {
             nodes.add(nodeResolver.getNode());
         }
         return nodes;
-    }
-
-    private boolean limitAndOffsetSupported() {
-        try {
-            boolean checkMethod = false;
-            BeanInfo info = Introspector.getBeanInfo(Query.class);
-            for (MethodDescriptor md : info.getMethodDescriptors()) {
-                if ("setLimit".equals(md.getName())) {
-                    checkMethod = true;
-                    break;
-                }
-            }
-            return checkMethod;
-        } catch (IntrospectionException e) {
-            return false;
-        }
     }
 
     protected String getLanguage() {
