@@ -1,18 +1,22 @@
 package com.dievision.sinicum.server.jcr;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.jcr.ItemNotFoundException;
-import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dievision.sinicum.server.mgnlAdapters.MgnlContextAdapter;
+
+import javax.jcr.ItemNotFoundException;
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.NodeIterator;
+
 
 /**
  * <p>Translates the Freemarker-based links to other nodes created by the WYSIWYG editor to
@@ -33,6 +37,27 @@ public class WysiwygTemplateTranslator {
     private static final String FINGERPRINT_VERSION = "2";
     private static final String FINGERPRINT_ALGORITHM = "MD5";
     private static final Logger logger = LoggerFactory.getLogger(WysiwygTemplateTranslator.class);
+    private static final ThreadLocal<ArrayList<String>> MULTISITE_NODES =
+            new ThreadLocal<ArrayList<String>>() {
+                @Override
+                protected ArrayList<String> initialValue() {
+                    ArrayList<String> list = new ArrayList<String>();
+                    Session session = null;
+                    try {
+                        session = MgnlContextAdapter.getJcrSession("multisite");
+                        NodeIterator it = session.getRootNode().getNodes();
+                        while (it.hasNext()) {
+                            Node node = it.nextNode();
+                            if (node.hasProperty("root_node")) {
+                                list.add(node.getProperty("root_node").getString());
+                            }
+                        }
+                    } catch (RepositoryException e) {
+                        e.printStackTrace();
+                    }
+                    return list;
+                }
+            };
 
 
     public String translate(String source) {
@@ -68,7 +93,7 @@ public class WysiwygTemplateTranslator {
         } else if ("dms".equals(node.getSession().getWorkspace().getName())) {
             return DMS_PREFIX + node.getPath();
         } else {
-            return node.getPath();
+            return multisiteAwarePath(node.getPath());
         }
     }
 
@@ -106,5 +131,12 @@ public class WysiwygTemplateTranslator {
             logger.error("Could not create fingerprint: " + e.toString());
         }
         return fingerprint;
+    }
+
+    private String multisiteAwarePath(String path) throws RepositoryException {
+        for (String rootNode : MULTISITE_NODES.get()) {
+            path = path.replaceAll(rootNode, "");
+        }
+        return path;
     }
 }

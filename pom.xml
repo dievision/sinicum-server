@@ -4,7 +4,7 @@
 
   <groupId>com.dievision.sinicum</groupId>
   <artifactId>sinicum-server-parent</artifactId>
-  <version>0.10.2</version>
+  <version>0.10.3</version>
   <packaging>pom</packaging>
 
   <name>sinicum-server-parent</name>
