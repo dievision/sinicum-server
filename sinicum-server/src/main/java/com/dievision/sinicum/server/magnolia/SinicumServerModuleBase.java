@@ -1,22 +1,18 @@
 package com.dievision.sinicum.server.magnolia;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-
+import com.dievision.sinicum.server.filters.ProxyEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dievision.sinicum.server.filters.ProxyFilterConfig;
 import com.dievision.sinicum.server.jcr.caching.CacheObserverManager;
 
-/**
- *
- */
+import javax.jcr.Node;
+import javax.jcr.NodeIterator;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+
 public class SinicumServerModuleBase {
     private static final Logger logger = LoggerFactory.getLogger(SinicumServerModuleBase.class);
 
@@ -28,18 +24,21 @@ public class SinicumServerModuleBase {
     private void readModuleConfiguration(String moduleName, Session session) {
         logger.info("Configuring sinicum-server module...");
         try {
-            Node node = (Node) session.getItem("/modules/" + moduleName
-                    + "/config/proxy-servlet/default");
-            if (node.hasProperty("proxyPathPattern")) {
-                ProxyFilterConfig.getInstance().setProxyPattern(
-                        node.getProperty("proxyPathPattern").getString());
-            }
-            if (node.hasProperty("proxyTargetUri")) {
-                try {
-                    ProxyFilterConfig.getInstance().setProxyTargetUri(
-                            new URI(node.getProperty("proxyTargetUri").getString()));
-                } catch (URISyntaxException e) {
-                    logger.error("Error setting new sinicum-server proxy target: " + e.toString());
+            if (session.nodeExists("/modules/" + moduleName
+                    + "/config/proxy-servlet/default")) {
+                Node node = (Node) session.getItem("/modules/" + moduleName
+                        + "/config/proxy-servlet/default");
+                ProxyEntry entry = ProxyFilterConfig.buildProxyEntry(node);
+                ProxyFilterConfig.getInstance().addProxyEntry(entry);
+            } else {
+                Node parent = session.getNode("/modules/" + moduleName + "/config/proxy-servlet");
+                if (parent.hasNodes()) {
+                    NodeIterator it = parent.getNodes();
+                    while (it.hasNext()) {
+                        Node node = it.nextNode();
+                        ProxyEntry entry = ProxyFilterConfig.buildProxyEntry(node);
+                        ProxyFilterConfig.getInstance().addProxyEntry(entry);
+                    }
                 }
             }
             logger.info("Success");

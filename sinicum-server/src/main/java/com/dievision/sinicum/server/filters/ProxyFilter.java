@@ -138,9 +138,9 @@ public class ProxyFilter {
         HttpClient proxyClient = createNewClient();
         try {
             // Execute the request
-            HttpResponse proxyResponse =
-                    proxyClient.execute(URIUtils.extractHost(
-                            ProxyFilterConfig.getInstance().getProxyTargetUri()), proxyRequest);
+            HttpResponse proxyResponse = proxyClient.execute(URIUtils.extractHost(
+                    ProxyFilterConfig.getInstance().getProxyTargetUri(
+                            proxyRequestUri)), proxyRequest);
 
             // Process the response
             int statusCode = proxyResponse.getStatusLine().getStatusCode();
@@ -297,7 +297,8 @@ public class ProxyFilter {
                 // the correct virtual server
                 if (headerName.equalsIgnoreCase(HttpHeaders.HOST)) {
                     HttpHost host = URIUtils.extractHost(
-                            ProxyFilterConfig.getInstance().getProxyTargetUri());
+                            ProxyFilterConfig.getInstance().getProxyTargetUri(
+                                    servletRequest.getRequestURI()));
                     headerValue = host.getHostName();
                     if (host.getPort() != -1) {
                         headerValue += ":" + host.getPort();
@@ -339,7 +340,8 @@ public class ProxyFilter {
 
     private String rewriteUrlFromRequest(HttpServletRequest request) {
         StringBuilder uri = new StringBuilder(500);
-        uri.append(ProxyFilterConfig.getInstance().getProxyTargetUri().toString());
+        uri.append(ProxyFilterConfig.getInstance().getProxyTargetUri(
+                request.getRequestURI()).toString());
         // Handle the path given to the servlet
         if (request.getRequestURI() != null) { //ex: /my/path.html
             uri.append(request.getRequestURI());
@@ -362,7 +364,8 @@ public class ProxyFilter {
 
     private String rewriteUrlFromResponse(HttpServletRequest request, String theUrl) {
         //TODO document example paths
-        if (theUrl.startsWith(ProxyFilterConfig.getInstance().getProxyTargetUri().toString())) {
+        if (theUrl.startsWith(ProxyFilterConfig.getInstance().getProxyTargetUri(
+                request.getRequestURI()).toString())) {
             String curUrl = request.getRequestURL().toString(); //no query
             String pathInfo = request.getRequestURI();
             if (pathInfo != null) {
@@ -371,7 +374,7 @@ public class ProxyFilter {
                 curUrl = curUrl.substring(0, curUrl.length() - pathInfo.length());
             }
             theUrl = curUrl + theUrl.substring(ProxyFilterConfig.getInstance()
-                    .getProxyTargetUri().toString().length());
+                    .getProxyTargetUri(request.getRequestURI()).toString().length());
         }
         return theUrl;
     }

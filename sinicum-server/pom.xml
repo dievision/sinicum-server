@@ -29,11 +29,6 @@
         <version>${jerseyVersion}</version>
     </dependency>
     <dependency>
-        <groupId>org.glassfish.jersey.containers</groupId>
-        <artifactId>jersey-container-servlet</artifactId>
-        <version>${jerseyVersion}</version>
-    </dependency>
-    <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
         <artifactId>jersey-media-json-jackson</artifactId>
         <version>${jerseyVersion}</version>

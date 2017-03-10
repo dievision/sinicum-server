@@ -2,41 +2,48 @@ package com.dievision.sinicum.server.filters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
+
 public final class ProxyFilterConfig {
     private static ProxyFilterConfig instance = null;
-    private Pattern proxyPattern;
-    private URI proxyTargetUri;
-    private static final String DEFAULT_PATH_PATTERN = "/.*";
-    private static final String DEFAULT_PROXY_TARGET_URI = "http://localhost:3000";
+    private ArrayList<ProxyEntry> entries = new ArrayList<ProxyEntry>();
     private static final Logger logger = LoggerFactory.getLogger(ProxyFilterConfig.class);
 
     private ProxyFilterConfig() {
         // nothing
     }
 
-    public boolean matchesPath(String path) {
-        if (path == null) {
-            return false;
-        } else {
-            return proxyPattern.matcher(path).matches();
+    public boolean matchesPath(String proxyPath) {
+        boolean performProxying = false;
+        for (ProxyEntry entry : getProxyEntries()) {
+            if (entry.getProxyPattern().matcher(proxyPath).matches()) {
+                performProxying = true;
+            }
         }
+        return performProxying;
     }
 
-    public URI getProxyTargetUri() {
-        return proxyTargetUri;
+    public void addProxyEntry(ProxyEntry entry) {
+        entries.add(entry);
     }
 
-    public void setProxyTargetUri(URI proxyTargetUri) {
-        this.proxyTargetUri = proxyTargetUri;
+    public ArrayList<ProxyEntry> getProxyEntries() {
+        return entries;
     }
 
-    public void setProxyPattern(String pattern) {
-        proxyPattern = Pattern.compile(pattern);
+    public URI getProxyTargetUri(String proxyPath) {
+        for (ProxyEntry entry : getProxyEntries()) {
+            if (entry.getProxyPattern().matcher(proxyPath).matches()) {
+                return entry.getProxyTargetUri();
+            }
+        }
+        return null;
     }
 
     public static ProxyFilterConfig getInstance() {
@@ -44,18 +51,27 @@ public final class ProxyFilterConfig {
             synchronized (ProxyFilterConfig.class) {
                 if (instance == null) {
                     ProxyFilterConfig proxyFilterConfig = new ProxyFilterConfig();
-                    proxyFilterConfig.setProxyPattern(DEFAULT_PATH_PATTERN);
-                    try {
-                        proxyFilterConfig.setProxyTargetUri(new URI(DEFAULT_PROXY_TARGET_URI));
-                    } catch (URISyntaxException e) {
-                        logger.error("Error setting sinicum-server default proxy target: "
-                                + e.toString());
-                    }
+
                     instance = proxyFilterConfig;
                 }
             }
         }
         return instance;
+    }
+
+    public static ProxyEntry buildProxyEntry(Node node) throws RepositoryException {
+        ProxyEntry entry = new ProxyEntry();
+        if (node.hasProperty("proxyPathPattern")) {
+            entry.setProxyPattern(node.getProperty("proxyPathPattern").getString());
+        }
+        if (node.hasProperty("proxyTargetUri")) {
+            try {
+                entry.setProxyTargetUri(new URI(node.getProperty("proxyTargetUri").getString()));
+            } catch (URISyntaxException e) {
+                logger.error("Error setting new sinicum-server proxy target: " + e.toString());
+            }
+        }
+        return entry;
     }
 
 }
