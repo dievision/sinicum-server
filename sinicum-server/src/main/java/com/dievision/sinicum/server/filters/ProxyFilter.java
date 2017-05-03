@@ -140,7 +140,7 @@ public class ProxyFilter {
             // Execute the request
             HttpResponse proxyResponse = proxyClient.execute(URIUtils.extractHost(
                     ProxyFilterConfig.getInstance().getProxyTargetUri(
-                            proxyRequestUri)), proxyRequest);
+                            request.getRequestURI())), proxyRequest);
 
             // Process the response
             int statusCode = proxyResponse.getStatusLine().getStatusCode();
