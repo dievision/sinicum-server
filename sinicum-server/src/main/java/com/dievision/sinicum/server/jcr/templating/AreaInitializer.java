@@ -95,6 +95,7 @@ public class AreaInitializer {
         String template = null;
         try {
             template = getTemplateNameForNode(pageNode);
+            logger.error("Template is => " + template);
         } catch (RepositoryException e) {
             logger.error("Error finding template name: " + e.toString());
         }
@@ -102,7 +103,7 @@ public class AreaInitializer {
             ComponentId componentId = new ComponentId(template);
             try {
                 Session configSession = MgnlContextAdapter.getJcrSession("config");
-                String stmt = "/jcr:root/modules//templates/"
+                String stmt = "/jcr:root/modules/" + componentId.getComponent() + "/templates/"
                         + componentId.parentPathElement() + "/" + componentId.getPath() + "/areas"
                         + "/" + areaName;
                 Query query = configSession.getWorkspace().getQueryManager()
