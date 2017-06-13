@@ -17,14 +17,14 @@ public final class GlobalRepositoryState {
 
     public static String getCacheKey() {
         if (cacheKey == null) {
-            GlobalRepositoryState.updateCacheKey();
+            updateCacheKey();
         }
         return cacheKey;
     }
 
     public static String getCacheKey(String sitePrefix) {
         if (!cacheKeys.containsKey(sitePrefix)) {
-            GlobalRepositoryState.updateCacheKey(sitePrefix);
+            updateCacheKey(sitePrefix);
         }
         return cacheKeys.get(sitePrefix);
     }
