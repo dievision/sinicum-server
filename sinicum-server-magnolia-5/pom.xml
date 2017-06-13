@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.dievision.sinicum</groupId>
     <artifactId>sinicum-server-parent</artifactId>
-    <version>0.10.3</version>
+    <version>0.10.4</version>
   </parent>
 
   <artifactId>sinicum-server-magnolia-5</artifactId>
