@@ -11,11 +11,12 @@ import org.slf4j.LoggerFactory;
 
 import com.dievision.sinicum.server.mgnlAdapters.MgnlContextAdapter;
 
-import javax.jcr.ItemNotFoundException;
+import javax.jcr.NoSuchWorkspaceException;
 import javax.jcr.Node;
-import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 import javax.jcr.NodeIterator;
+import javax.jcr.Session;
+import javax.jcr.RepositoryException;
+import javax.jcr.ItemNotFoundException;
 
 
 /**
@@ -52,6 +53,8 @@ public class WysiwygTemplateTranslator {
                                 list.add(node.getProperty("root_node").getString());
                             }
                         }
+                    } catch (NoSuchWorkspaceException e) {
+                        // do nothing - workspace does not exist
                     } catch (RepositoryException e) {
                         e.printStackTrace();
                     }
