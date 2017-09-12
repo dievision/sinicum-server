@@ -1,22 +1,22 @@
 package com.dievision.sinicum.server.jcr;
 
-import java.util.List;
-
-import javax.jcr.RepositoryException;
-import javax.jcr.query.Query;
-
+import com.dievision.sinicum.server.JackrabbitTest45;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dievision.sinicum.server.JackrabbitTest45;
+import javax.jcr.RepositoryException;
+import javax.jcr.query.Query;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class NodeQueryManagerTest extends JackrabbitTest45 {
     private static final String QUERY = "/jcr:root//*[@jcr:primaryType = 'mgnl:contentNode'] "
             + "order by @jcr:path";
+
     private static final Logger logger = LoggerFactory.getLogger(NodeQueryManagerTest.class);
 
     @Before
@@ -31,6 +31,45 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
         assertEquals(203, allNodes.size());
     }
     */
+
+    @Test
+    public void testNodeAsANumberXpath() throws RepositoryException {
+        String [] queries = {
+            "/jcr:root/333[1]/1111[1]/11111//element(123,mix:title)"
+                + "[jcr:contains(.,'123,132:break')]",
+            "//element(*, mgnl:user)[@email = 'eric@example.com']",
+            "//*[@mgnl:template = 'stkTeaser']",
+            "/jcr:root/demo-project//element(*, mgnl:metaData)" +
+                    "[@mgnl:template = 'standard-templating-kit:pages/stkArticle']/.." +
+                    "[@categories = 'ab9437db-ab2c-4df5-bb41-87e55409e8e1'] order by @date",
+            "//element(89878node, mgnl:content)[jcr:like(@title, '%News%')]"};
+
+        for (String query : queries) {
+            try {
+                if (isVersion2()) {
+                    NodeQueryManager nodeQueryManager =
+                            new NodeQueryManager("config", query, Query.XPATH, 0, 0);
+                    List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
+                    assertEquals(0, result.size());
+                }
+            } catch (Exception e){
+                assertNull(e);
+            }
+        }
+
+        String query = "/jcr:root/templates/components/1234_test_sections/*";
+        try{
+            if (isVersion2()) {
+                NodeQueryManager nodeQueryManager =
+                        new NodeQueryManager("config", query, Query.XPATH, 0, 0);
+                List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
+                assertEquals(3, result.size());
+            }
+        } catch (Exception e){
+            assertNull(e);
+        }
+
+    }
 
     @Test
     public void testLimit() throws RepositoryException {
