@@ -39,9 +39,9 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
                 + "[jcr:contains(.,'123,132:break')]",
             "//element(*, mgnl:user)[@email = 'eric@example.com']",
             "//*[@mgnl:template = 'stkTeaser']",
-            "/jcr:root/demo-project//element(*, mgnl:metaData)" +
-                    "[@mgnl:template = 'standard-templating-kit:pages/stkArticle']/.." +
-                    "[@categories = 'ab9437db-ab2c-4df5-bb41-87e55409e8e1'] order by @date",
+            "/jcr:root/demo-project//element(*, mgnl:metaData)"
+                + "[@mgnl:template = 'standard-templating-kit:pages/stkArticle']/.."
+                + "[@categories = 'ab9437db-ab2c-4df5-bb41-87e55409e8e1'] order by @date",
             "//element(89878node, mgnl:content)[jcr:like(@title, '%News%')]"};
 
         for (String query : queries) {
@@ -52,20 +52,20 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
                     List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
                     assertEquals(0, result.size());
                 }
-            } catch (Exception e){
+            } catch (Exception e) {
                 assertNull(e);
             }
         }
 
         String query = "/jcr:root/templates/components/1234_test_sections/*";
-        try{
+        try {
             if (isVersion2()) {
                 NodeQueryManager nodeQueryManager =
                         new NodeQueryManager("config", query, Query.XPATH, 0, 0);
                 List<NodeApiWrapper> result = nodeQueryManager.executeQuery();
                 assertEquals(3, result.size());
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             assertNull(e);
         }
 

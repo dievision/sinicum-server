@@ -89,7 +89,7 @@ public class NodeQueryManager {
     private String encodeXPathQuery(String query) {
         String [] toEncodeNodes = query.split("\\[(.?)\\]|\\[(.*)\\]");
         String [] encodedNodes = new String[toEncodeNodes.length];
-        for (int i = 0; i < toEncodeNodes.length; i++ ) {
+        for (int i = 0; i < toEncodeNodes.length; i++) {
             String replaceNode = toEncodeNodes[i];
             Matcher matchNode = Pattern.compile("[0-9]+").matcher(toEncodeNodes[i]);
             while (matchNode.find()) {
