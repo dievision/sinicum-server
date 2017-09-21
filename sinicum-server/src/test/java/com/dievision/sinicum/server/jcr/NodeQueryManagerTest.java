@@ -68,7 +68,6 @@ public class NodeQueryManagerTest extends JackrabbitTest45 {
         } catch (Exception e) {
             assertNull(e);
         }
-
     }
 
     @Test

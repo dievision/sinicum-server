@@ -87,11 +87,13 @@ public class NodeQueryManager {
     }
 
     private String encodeXPathQuery(String query) {
-        String [] toEncodeNodes = query.split("\\[(.?)\\]|\\[(.*)\\]");
-        String [] encodedNodes = new String[toEncodeNodes.length];
-        for (int i = 0; i < toEncodeNodes.length; i++) {
-            String replaceNode = toEncodeNodes[i];
-            Matcher matchNode = Pattern.compile("[0-9]+").matcher(toEncodeNodes[i]);
+        String [] queryPartToEncode = query.split("\\[(.?)\\]|\\[(.*)\\]");
+        String [] encodedNodes = new String[queryPartToEncode.length];
+        String replaceNode = null;
+        Matcher matchNode = null;
+        for (int i = 0; i < queryPartToEncode.length; i++) {
+            replaceNode = queryPartToEncode[i];
+            matchNode = Pattern.compile("[0-9]+").matcher(queryPartToEncode[i]);
             while (matchNode.find()) {
                 replaceNode =
                         replaceNode.replace(matchNode.group(0), ISO9075.encode(matchNode.group(0)));
@@ -99,9 +101,10 @@ public class NodeQueryManager {
             }
         }
         if (encodedNodes[0] != null) {
-            for (int i = 0; i < toEncodeNodes.length; i++) {
-                String toEncodeNode = toEncodeNodes[i];
-                String encodedNode = encodedNodes[i];
+            String toEncodeNode, encodedNode = null;
+            for (int i = 0; i < queryPartToEncode.length; i++) {
+                toEncodeNode = queryPartToEncode[i];
+                encodedNode = encodedNodes[i];
                 int startIndex, endIndex = 0;
                 startIndex = query.indexOf(toEncodeNode);
                 endIndex = startIndex + toEncodeNode.length();
