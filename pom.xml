@@ -4,7 +4,7 @@
 
   <groupId>com.dievision.sinicum</groupId>
   <artifactId>sinicum-server-parent</artifactId>
-  <version>0.10.3</version>
+  <version>0.10.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>sinicum-server-parent</name>
@@ -12,7 +12,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <javaVersion>1.8</javaVersion>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <modules>

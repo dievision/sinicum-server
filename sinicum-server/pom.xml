@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.dievision.sinicum</groupId>
     <artifactId>sinicum-server-parent</artifactId>
-    <version>0.10.3</version>
+    <version>0.10.4-SNAPSHOT</version>
   </parent>
 
   <artifactId>sinicum-server</artifactId>
@@ -16,6 +16,7 @@
   <url>http://maven.apache.org</url>
 
   <properties>
+    <javaVersion>1.8</javaVersion>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <jacksonVersion>2.7.2</jacksonVersion>
     <jerseyVersion>2.22.2</jerseyVersion>
@@ -77,21 +78,21 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.11</version>
+      <version>1.7.25</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.11</version>
+      <version>1.7.25</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.1.2</version>
+      <version>4.5.5</version>
     </dependency>
 
     <dependency>
