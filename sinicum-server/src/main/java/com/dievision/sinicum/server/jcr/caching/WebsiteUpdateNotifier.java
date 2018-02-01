@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class WebsiteUpdateNotifier implements EventListener {
@@ -38,7 +40,7 @@ public class WebsiteUpdateNotifier implements EventListener {
     public WebsiteUpdateNotifier(String targetServerUrl, String targetServerAuthToken) {
         this.targetServerUrl = targetServerUrl;
         this.targetServerAuthToken = targetServerAuthToken;
-        new Thread(new Updater()).start();
+        startUpdaterService();
     }
 
     public void onEvent(EventIterator events) {
@@ -51,6 +53,11 @@ public class WebsiteUpdateNotifier implements EventListener {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void startUpdaterService() {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleWithFixedDelay(new Updater(), 10, 3, TimeUnit.SECONDS);
     }
 
     private String findMultisiteDomainKey(String path) {
@@ -91,14 +98,10 @@ public class WebsiteUpdateNotifier implements EventListener {
         private HttpClient httpClient = HttpClients.createDefault();
 
         public void run() {
-            boolean active = true;
-            while (active) {
-                try {
-                    sendUpdateRequestIfNecessary(System.currentTimeMillis());
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (InterruptedException e) {
-                    active = false;
-                }
+            try {
+                sendUpdateRequestIfNecessary(System.currentTimeMillis());
+            } catch (Exception e) {
+                logger.error("Error executing website update notifier: " + e.getMessage());
             }
         }
 
