@@ -27,6 +27,7 @@ public class NavigationProviderTest extends JackrabbitTest45 {
         Node node00 = node0.addNode("00", "mgnl:page");
         node00.setProperty("title", "Title");
         node00.setProperty("navigation_title", "Navigation Title");
+        node00.setProperty("nav_hidden", false);
         Node node01 = node0.addNode("01", "mgnl:page");
         Node area = node0.addNode("00area", "mgnl:area");
         Node node000 = node00.addNode("000", "mgnl:page");
