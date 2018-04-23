@@ -1,10 +1,11 @@
 package com.dievision.sinicum.server.jcr.caching;
 
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ public class WebsiteUpdateNotifier implements EventListener {
         if (events.hasNext()) {
             Event event = events.nextEvent();
             try {
+                logger.info("Update event for " + event.getPath());
                 String domainKey = findMultisiteDomainKey(event.getPath());
                 lastUpdated.put(domainKey, System.currentTimeMillis());
             } catch (RepositoryException e) {
@@ -95,9 +97,14 @@ public class WebsiteUpdateNotifier implements EventListener {
 
     private class Updater implements Runnable {
         private Map<String, Long> lastNotified = new HashMap<>();
-        private HttpClient httpClient = HttpClients.createDefault();
+        private CloseableHttpClient httpClient = HttpClients.createDefault();
+        private long counter = 0;
 
         public void run() {
+            if (counter % 20 == 0) {
+                logger.info("Running website update notifier");
+            }
+            counter++;
             try {
                 sendUpdateRequestIfNecessary(System.currentTimeMillis());
             } catch (Exception e) {
@@ -130,15 +137,26 @@ public class WebsiteUpdateNotifier implements EventListener {
                 delete.setHeader("Content-Type", "application/json");
                 delete.setHeader("Accept", "application/json");
                 delete.setHeader("Auth", targetServerAuthToken);
+                int timeout = 5 * 1000;
+                RequestConfig requestConfig = RequestConfig.custom()
+                        .setConnectionRequestTimeout(timeout)
+                        .setConnectTimeout(timeout)
+                        .setSocketTimeout(timeout)
+                        .build();
+                delete.setConfig(requestConfig);
                 logger.info("Sending update to " + uri.toString());
-                HttpResponse response = httpClient.execute(delete);
-                if (response.getStatusLine().getStatusCode() == 200) {
-                    logger.info("Update successful for namespace " + namespace);
-                    return true;
-                } else {
-                    logger.error("Error sending update notification: "
-                            + response.getStatusLine().getReasonPhrase());
-                    return false;
+                CloseableHttpResponse response = httpClient.execute(delete);
+                try {
+                    if (response.getStatusLine().getStatusCode() == 200) {
+                        logger.info("Update successful for namespace " + namespace);
+                        return true;
+                    } else {
+                        logger.error("Error sending update notification: "
+                                + response.getStatusLine().getReasonPhrase());
+                        return false;
+                    }
+                } finally {
+                    response.close();
                 }
             } catch (Exception e) {
                 logger.error("Error sending update notification: " + e.getMessage());
