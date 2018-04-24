@@ -17,6 +17,7 @@ public class NavigationProvider extends NavigationProviderBase {
     private final List<String> properties;
 
     private static final String PAGE_TYPE = "mgnl:page";
+    private static final String HIDDEN_PROPERTY = "nav_hidden";
     private static final Logger logger = LoggerFactory.getLogger(NavigationProvider.class);
 
     public NavigationProvider(String baseNodeUuidOrPath, List<String> properties, int depth)
@@ -31,7 +32,7 @@ public class NavigationProvider extends NavigationProviderBase {
         NodeIterator iterator = node.getNodes();
         while (iterator.hasNext()) {
             Node child = iterator.nextNode();
-            if (PAGE_TYPE.equals(child.getPrimaryNodeType().getName())) {
+            if (PAGE_TYPE.equals(child.getPrimaryNodeType().getName()) && showInNavigation(child)) {
                 NavigationElement element = new NavigationElement(child, properties);
                 if (child.getDepth() <= maximumAllowedDepth()) {
                     element.setChildren(findNavigationElements(child));
@@ -40,6 +41,14 @@ public class NavigationProvider extends NavigationProviderBase {
             }
         }
         return elements;
+    }
+
+    private boolean showInNavigation(Node node) throws RepositoryException {
+        if (node.hasProperty(HIDDEN_PROPERTY)) {
+            return !node.getProperty(HIDDEN_PROPERTY).getBoolean();
+        } else {
+            return true;
+        }
     }
 
     private int maximumAllowedDepth() throws RepositoryException {
