@@ -213,8 +213,9 @@ public class ProxyFilter {
         throws ServletException, IOException {
         // Check if the proxy response is a redirect
         // The following code is adapted from org.tigris.noodle.filters.CheckForRedirect
-        if (statusCode >= HttpServletResponse.SC_MULTIPLE_CHOICES /* 300 */
-                && statusCode < HttpServletResponse.SC_NOT_MODIFIED /* 304 */) {
+        if ((statusCode >= HttpServletResponse.SC_MULTIPLE_CHOICES /* 300 */
+                && statusCode < HttpServletResponse.SC_NOT_MODIFIED /* 304 */)
+                || statusCode == HttpServletResponse.SC_TEMPORARY_REDIRECT /* 307 */) {
             Header locationHeader = proxyResponse.getLastHeader(HttpHeaders.LOCATION);
             if (locationHeader == null) {
                 throw new ServletException("Received status code: " + statusCode
