@@ -110,7 +110,8 @@ public class ProxyFilter {
     }
 
     private void performProxyRequest(HttpServletRequest servletRequest,
-                                     HttpServletResponse servletResponse) throws IOException, ServletException {
+                                     HttpServletResponse servletResponse)
+        throws IOException, ServletException {
         // Make the Request
         // note: we won't transfer the protocol version because I'm not sure it would truly be
         // compatible
@@ -347,7 +348,7 @@ public class ProxyFilter {
     protected void copyResponseEntity(HttpResponse proxyResponse,
                                       HttpServletResponse servletResponse,
                                       HttpRequest proxyRequest, HttpServletRequest servletRequest)
-            throws IOException {
+        throws IOException {
         HttpEntity entity = proxyResponse.getEntity();
         if (entity != null) {
             OutputStream servletOutputStream = servletResponse.getOutputStream();
@@ -405,8 +406,8 @@ public class ProxyFilter {
     static {
         HOP_BY_HOP_HEADERS = new HeaderGroup();
         String[] headers = new String[]{
-                "Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization",
-                "TE", "Trailers", "Transfer-Encoding", "Upgrade"};
+            "Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization",
+            "TE", "Trailers", "Transfer-Encoding", "Upgrade"};
         for (String header : headers) {
             HOP_BY_HOP_HEADERS.addHeader(new BasicHeader(header, null));
         }
