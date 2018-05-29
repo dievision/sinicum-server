@@ -18,6 +18,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
     private Node page1;
     private Node page2;
     private Node page3;
+    private Node page4;
     private Node dmsFile;
     private Node damFile;
     private static final Logger logger =
@@ -30,6 +31,8 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         page1 = root.addNode("my-node", "mgnl:content");
         page2 = page1.addNode("subnode", "mgnl:content");
         page3 = root.addNode("en-GB", "mgnl:page").addNode("nice-subpage", "mgnl:page");
+        page4 = root.addNode("b2b", "mgnl:page").addNode("de-DE", "mgnl:page")
+                    .addNode("b2b-subpage", "mgnl:page");
         session.save();
         Session dmsSession = getJcrSession("dms");
         Node dmsRoot = dmsSession.getRootNode();
@@ -45,6 +48,7 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
         root = session.getRootNode();
         Node multisiteNode = root.addNode("en-gb", "mgnl:content");
         multisiteNode.setProperty("root_node", "/en-GB");
+        root.addNode("b2b", "mgnl:content").setProperty("root_node", "/b2b/de-DE");
         session.save();
     }
 
@@ -103,6 +107,17 @@ public class WysiwygTemplateTranslatorTest extends JackrabbitTest45 {
                 + "End";
         WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
         assertEquals("Start /nice-subpage End", translator.translate(source));
+    }
+
+    @Test
+    public void testTwoLevelMultisiteLink() throws RepositoryException {
+        assertEquals("/b2b/de-DE/b2b-subpage", page4.getPath());
+        String source = "Start ${link:{uuid:{" + page4.getIdentifier() + "},"
+                + "repository:{" + page4.getSession().getWorkspace().getName() + "},"
+                + "handle:{" + page4.getPath() + "},nodeData:{},extension:{html}}} "
+                + "End";
+        WysiwygTemplateTranslator translator = new WysiwygTemplateTranslator();
+        assertEquals("Start /b2b-subpage End", translator.translate(source));
     }
 
 }

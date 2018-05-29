@@ -35,19 +35,20 @@ import org.apache.http.message.BasicHttpRequest;
 import org.apache.http.message.HeaderGroup;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.util.EntityUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpCookie;
 import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -89,7 +90,7 @@ public class ProxyFilter {
     }
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+                         FilterChain filterChain) throws ServletException, IOException {
         String proxyPath = request.getRequestURI();
         boolean performProxying = ProxyFilterConfig.getInstance().matchesPath(proxyPath);
         if (performProxying) {
@@ -108,30 +109,31 @@ public class ProxyFilter {
         }
     }
 
-    private void performProxyRequest(HttpServletRequest request,
-            HttpServletResponse response) throws IOException, ServletException {
+    private void performProxyRequest(HttpServletRequest servletRequest,
+                                     HttpServletResponse servletResponse)
+        throws IOException, ServletException {
         // Make the Request
         // note: we won't transfer the protocol version because I'm not sure it would truly be
         // compatible
-        String method = request.getMethod();
-        String proxyRequestUri = rewriteUrlFromRequest(request);
+        String method = servletRequest.getMethod();
+        String proxyRequestUri = rewriteUrlFromRequest(servletRequest);
         HttpRequest proxyRequest;
         //spec: RFC 2616, sec 4.3: either these two headers signal that there is a message body.
-        if (request.getHeader(HttpHeaders.CONTENT_LENGTH) != null
-                || request.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) {
+        if (servletRequest.getHeader(HttpHeaders.CONTENT_LENGTH) != null
+                || servletRequest.getHeader(HttpHeaders.TRANSFER_ENCODING) != null) {
             HttpEntityEnclosingRequest eProxyRequest =
                     new BasicHttpEntityEnclosingRequest(method, proxyRequestUri);
             // Add the input entity (streamed)
             // note: we don't bother ensuring we close the servletInputStream since the container
             // handles it
-            eProxyRequest.setEntity(new InputStreamEntity(request.getInputStream(),
-                    request.getContentLength()));
+            eProxyRequest.setEntity(new InputStreamEntity(servletRequest.getInputStream(),
+                    servletRequest.getContentLength()));
             proxyRequest = eProxyRequest;
         } else {
             proxyRequest = new BasicHttpRequest(method, proxyRequestUri);
         }
 
-        copyRequestHeaders(request, proxyRequest);
+        copyRequestHeaders(servletRequest, proxyRequest);
         addProtocolHeaders(proxyRequest);
         addMagnoliaHeaders(proxyRequest);
 
@@ -143,25 +145,26 @@ public class ProxyFilter {
                             ProxyFilterConfig.getInstance().getProxyTargetUri()), proxyRequest);
 
             // Process the response
-            int statusCode = proxyResponse.getStatusLine().getStatusCode();
 
-            if (doResponseRedirectOrNotModifiedLogic(request, response, proxyResponse,
-                    statusCode)) {
-                //just to be sure, but is probably a no-op
-                EntityUtils.consume(proxyResponse.getEntity());
-                return;
-            }
 
             // Pass the response code. This method with the "reason phrase" is deprecated but it's
             // the only way to pass the reason along too.
+            int statusCode = proxyResponse.getStatusLine().getStatusCode();
+
             // noinspection deprecation
-            response.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
+            servletResponse.setStatus(statusCode, proxyResponse.getStatusLine().getReasonPhrase());
 
-            copyResponseHeaders(proxyResponse, response);
+            copyResponseHeaders(proxyResponse, servletRequest, servletResponse);
 
-            // Send the content to the client
-            copyResponseEntity(proxyResponse, response);
-
+            if (statusCode == HttpServletResponse.SC_NOT_MODIFIED) {
+                // 304 needs special handling.  See:
+                // http://www.ics.uci.edu/pub/ietf/http/rfc1945.html#Code304
+                // Don't send body entity/content!
+                servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, 0);
+            } else {
+                // Send the content to the client
+                copyResponseEntity(proxyResponse, servletResponse, proxyRequest, servletRequest);
+            }
         } catch (Exception e) {
             //abort request, according to best practice with HttpClient
             if (proxyRequest instanceof AbortableHttpRequest) {
@@ -196,6 +199,7 @@ public class ProxyFilter {
         }
     }
 
+
     private void addMagnoliaHeaders(HttpRequest proxyRequest) {
         proxyRequest.addHeader("X-Mgnl-Admin", "true");
         proxyRequest.addHeader("X-Mgnl-Preview",
@@ -208,61 +212,11 @@ public class ProxyFilter {
                 && proxyRequest.getRequestLine().getUri().startsWith("https://");
     }
 
-    private boolean doResponseRedirectOrNotModifiedLogic(HttpServletRequest servletRequest,
-            HttpServletResponse servletResponse, HttpResponse proxyResponse, int statusCode)
-        throws ServletException, IOException {
-        // Check if the proxy response is a redirect
-        // The following code is adapted from org.tigris.noodle.filters.CheckForRedirect
-        if (statusCode >= HttpServletResponse.SC_MULTIPLE_CHOICES /* 300 */
-                && statusCode < HttpServletResponse.SC_NOT_MODIFIED /* 304 */) {
-            Header locationHeader = proxyResponse.getLastHeader(HttpHeaders.LOCATION);
-            if (locationHeader == null) {
-                throw new ServletException("Received status code: " + statusCode
-                        + " but no " + HttpHeaders.LOCATION + " header was found in the response");
-            }
-            // Modify the redirect to go to this proxy servlet rather that the proxied host
-            String locStr = rewriteUrlFromResponse(servletRequest, locationHeader.getValue());
-
-            servletResponse.sendRedirect(locStr);
-            return true;
-        }
-        // 304 needs special handling.  See:
-        // http://www.ics.uci.edu/pub/ietf/http/rfc1945.html#Code304
-        // We get a 304 whenever passed an 'If-Modified-Since'
-        // header and the data on disk has not changed; server
-        // responds w/ a 304 saying I'm not going to send the
-        // body because the file has not changed.
-        if (statusCode == HttpServletResponse.SC_NOT_MODIFIED) {
-            servletResponse.setIntHeader(HttpHeaders.CONTENT_LENGTH, 0);
-            servletResponse.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-            return true;
-        }
-        return false;
-    }
-
     private void closeQuietly(Closeable closeable) {
         try {
             closeable.close();
         } catch (IOException e) {
             logger.error(e.getMessage());
-        }
-    }
-
-    /**
-     * These are the "hop-by-hop" headers that should not be copied.
-     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
-     * I use an HttpClient HeaderGroup class instead of Set<String> because this approach does case
-     * insensitive lookup faster.
-     */
-    private static final HeaderGroup HOP_BY_HOP_HEADERS;
-
-    static {
-        HOP_BY_HOP_HEADERS = new HeaderGroup();
-        String[] headers = new String[]{
-            "Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization",
-            "TE", "Trailers", "Transfer-Encoding", "Upgrade"};
-        for (String header : headers) {
-            HOP_BY_HOP_HEADERS.addHeader(new BasicHeader(header, null));
         }
     }
 
@@ -302,38 +256,103 @@ public class ProxyFilter {
                     if (host.getPort() != -1) {
                         headerValue += ":" + host.getPort();
                     }
+                } else if (headerName.equalsIgnoreCase(org.apache.http.cookie.SM.COOKIE)) {
+                    headerValue = getRealCookie(headerValue);
                 }
                 proxyRequest.addHeader(headerName, headerValue);
             }
         }
     }
 
-    /**
-     * Copy proxied response headers back to the servlet client.
-     */
-    private void copyResponseHeaders(HttpResponse proxyResponse,
-            HttpServletResponse servletResponse) {
+    /** Copy proxied response headers back to the servlet client. */
+    protected void copyResponseHeaders(HttpResponse proxyResponse,
+                                       HttpServletRequest servletRequest,
+                                       HttpServletResponse servletResponse) {
         for (Header header : proxyResponse.getAllHeaders()) {
-            if (HOP_BY_HOP_HEADERS.containsHeader(header.getName())) {
-                continue;
-            }
-            servletResponse.addHeader(header.getName(), header.getValue());
+            copyResponseHeader(servletRequest, servletResponse, header);
+        }
+    }
+
+    /** Copy a proxied response header back to the servlet client.
+     * This is easily overwritten to filter out certain headers if desired.
+     */
+    protected void copyResponseHeader(HttpServletRequest servletRequest,
+                                      HttpServletResponse servletResponse, Header header) {
+        String headerName = header.getName();
+        if (HOP_BY_HOP_HEADERS.containsHeader(headerName)) {
+            return;
+        }
+        String headerValue = header.getValue();
+        if (headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE)
+                || headerName.equalsIgnoreCase(org.apache.http.cookie.SM.SET_COOKIE2)) {
+            copyProxyCookie(servletRequest, servletResponse, headerValue);
+        } else if (headerName.equalsIgnoreCase(HttpHeaders.LOCATION)) {
+            // LOCATION Header may have to be rewritten.
+            servletResponse.addHeader(headerName,
+                    rewriteUrlFromResponse(servletRequest, headerValue));
+        } else {
+            servletResponse.addHeader(headerName, headerValue);
         }
     }
 
     /**
-     * Copy response body data (the entity) from the proxy to the servlet client.
+     * Copy cookie from the proxy to the servlet client.
+     * Replaces cookie path to local path and renames cookie to avoid collisions.
      */
-    private void copyResponseEntity(HttpResponse proxyResponse, HttpServletResponse servletResponse)
+    protected void copyProxyCookie(HttpServletRequest servletRequest,
+                                   HttpServletResponse servletResponse, String headerValue) {
+        for (HttpCookie cookie : HttpCookie.parse(headerValue)) {
+            //set cookie name prefixed w/ a proxy value so it won't collide w/ other cookies
+            String proxyCookieName = getCookieNamePrefix(cookie.getName()) + cookie.getName();
+            Cookie servletCookie = new Cookie(proxyCookieName, cookie.getValue());
+            servletCookie.setComment(cookie.getComment());
+            servletCookie.setMaxAge(1200); // 20 minutes
+            servletCookie.setPath(cookie.getPath());
+            // don't set cookie domain
+            servletCookie.setSecure(cookie.getSecure());
+            servletCookie.setVersion(cookie.getVersion());
+            servletResponse.addCookie(servletCookie);
+        }
+    }
+
+    /**
+     * Take any client cookies that were originally from the proxy and prepare them to send to the
+     * proxy.  This relies on cookie headers being set correctly according to RFC 6265 Sec 5.4.
+     * This also blocks any local cookies from being sent to the proxy.
+     */
+    protected String getRealCookie(String cookieValue) {
+        StringBuilder escapedCookie = new StringBuilder();
+        String[] cookies = cookieValue.split("[;,]");
+        for (String cookie : cookies) {
+            String[] cookieSplit = cookie.split("=");
+            if (cookieSplit.length == 2) {
+                String cookieName = cookieSplit[0].trim();
+                if (cookieName.startsWith(getCookieNamePrefix(cookieName))) {
+                    cookieName = cookieName.substring(getCookieNamePrefix(cookieName).length());
+                    if (escapedCookie.length() > 0) {
+                        escapedCookie.append("; ");
+                    }
+                    escapedCookie.append(cookieName).append("=").append(cookieSplit[1].trim());
+                }
+            }
+        }
+        return escapedCookie.toString();
+    }
+
+    /** The string prefixing rewritten cookies. */
+    protected String getCookieNamePrefix(String name) {
+        return "!Proxy!Sinicum-Server";
+    }
+
+    /** Copy response body data (the entity) from the proxy to the servlet client. */
+    protected void copyResponseEntity(HttpResponse proxyResponse,
+                                      HttpServletResponse servletResponse,
+                                      HttpRequest proxyRequest, HttpServletRequest servletRequest)
         throws IOException {
         HttpEntity entity = proxyResponse.getEntity();
         if (entity != null) {
             OutputStream servletOutputStream = servletResponse.getOutputStream();
-            try {
-                entity.writeTo(servletOutputStream);
-            } finally {
-                closeQuietly(servletOutputStream);
-            }
+            entity.writeTo(servletOutputStream);
         }
     }
 
@@ -374,6 +393,24 @@ public class ProxyFilter {
                     .getProxyTargetUri().toString().length());
         }
         return theUrl;
+    }
+
+    /**
+     * These are the "hop-by-hop" headers that should not be copied.
+     * http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
+     * I use an HttpClient HeaderGroup class instead of Set<String> because this approach does case
+     * insensitive lookup faster.
+     */
+    private static final HeaderGroup HOP_BY_HOP_HEADERS;
+
+    static {
+        HOP_BY_HOP_HEADERS = new HeaderGroup();
+        String[] headers = new String[]{
+            "Connection", "Keep-Alive", "Proxy-Authenticate", "Proxy-Authorization",
+            "TE", "Trailers", "Transfer-Encoding", "Upgrade"};
+        for (String header : headers) {
+            HOP_BY_HOP_HEADERS.addHeader(new BasicHeader(header, null));
+        }
     }
 
     /**
