@@ -2,6 +2,7 @@ package com.dievision.sinicum.server.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -21,9 +22,28 @@ public class CacheResource {
         return new GlobalCacheKeyWrapper();
     }
 
+    @GET
+    @Path("/site/{sitePrefix: .+}")
+    public GlobalCacheKeyWrapper globalKey(@PathParam("sitePrefix") String sitePrefix) {
+        return new GlobalCacheKeyWrapper(sitePrefix);
+    }
+
     private static class GlobalCacheKeyWrapper {
+        private String sitePrefix;
+
+        public GlobalCacheKeyWrapper() {
+        }
+
+        public GlobalCacheKeyWrapper(String sitePrefix) {
+            this.sitePrefix = sitePrefix;
+        }
+
         public String getCacheKey() {
-            return GlobalRepositoryState.getCacheKey();
+            if (sitePrefix == null) {
+                return GlobalRepositoryState.getCacheKey();
+            } else {
+                return GlobalRepositoryState.getCacheKey(sitePrefix);
+            }
         }
     }
 }

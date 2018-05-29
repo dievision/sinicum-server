@@ -12,14 +12,21 @@ public class GlobalRepositoryStateTest {
 
     @Test
     public void testReturnCacheKey() {
-        String key = GlobalRepositoryState.getCacheKey();
+        String key = GlobalRepositoryState.getCacheKey("dievision");
         assertTrue(key.matches(".{40}"));
     }
 
     @Test
     public void testUpdateCacheKey() {
-        String key = GlobalRepositoryState.getCacheKey();
-        GlobalRepositoryState.updateCacheKey();
-        assertFalse(key.equals(GlobalRepositoryState.getCacheKey()));
+        String keyDievision = GlobalRepositoryState.getCacheKey("dievision");
+        GlobalRepositoryState.updateCacheKey("dievision");
+        assertFalse(keyDievision.equals(GlobalRepositoryState.getCacheKey("dievision")));
+    }
+
+    @Test
+    public void testDifferentCacheKeys() {
+        String keyDievision = GlobalRepositoryState.getCacheKey("dievision");
+        String keyCody = GlobalRepositoryState.getCacheKey("cody");
+        assertFalse(keyDievision.equals(keyCody));
     }
 }
