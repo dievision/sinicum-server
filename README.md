@@ -27,7 +27,7 @@ include the following dependency:
 <dependency>
   <groupId>com.dievision.sinicum</groupId>
   <artifactId>sinicum-server-magnolia-5</artifactId>
-  <version>0.11.2</version>
+  <version>0.11.3</version>
 </dependency>
 ```
 
@@ -185,8 +185,14 @@ Currently, the content API is read only.
 
 This functionality helps a client to decide if cached content can be
 used. The returned fingerprint changes every time a change is made to
-the `website`, `config`, or `dam` workspaces.
+the `website` or `dam` workspaces.
 
+In order to have better cache control when working with the multisite feature,
+you can also use
+
+    GET /_cache/site/{site_prefix}
+
+to get a cache key for the specific site prefix (that usually matches a multisite site).
 
 ## Proxy Filter
 
