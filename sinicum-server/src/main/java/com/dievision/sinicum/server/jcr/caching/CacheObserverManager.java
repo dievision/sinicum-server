@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import com.dievision.sinicum.server.mgnlAdapters.MgnlContextAdapter;
 
 public class CacheObserverManager {
-    private static final String[] OBSERVED_WORKSPACES = {"config", "data", "dms", "website"};
+    private static final String[] OBSERVED_WORKSPACES = {"data", "dms", "website"};
     private static final Logger logger = LoggerFactory.getLogger(CacheObserverManager.class);
 
     public void registerObservers() {
