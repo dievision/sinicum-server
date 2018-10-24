@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 public class CachingEventListener implements EventListener {
     private static final Logger logger = LoggerFactory.getLogger(CachingEventListener.class);
 
+    @Override
     public void onEvent(EventIterator events) {
         if (events.hasNext()) {
             Event event = events.nextEvent();
