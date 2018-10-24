@@ -47,7 +47,7 @@ public class CacheObserverManager {
     }
 
     private boolean hasNoCachingEventListener(ObservationManager observationManager)
-            throws RepositoryException {
+        throws RepositoryException {
         EventListenerIterator iterator = observationManager.getRegisteredEventListeners();
         while (iterator.hasNext()) {
             EventListener listener = iterator.nextEventListener();
@@ -83,7 +83,7 @@ public class CacheObserverManager {
     }
 
     private boolean hasNoUpdateNotifier(ObservationManager observationManager)
-            throws RepositoryException {
+        throws RepositoryException {
         EventListenerIterator iterator = observationManager.getRegisteredEventListeners();
         while (iterator.hasNext()) {
             EventListener listener = iterator.nextEventListener();
