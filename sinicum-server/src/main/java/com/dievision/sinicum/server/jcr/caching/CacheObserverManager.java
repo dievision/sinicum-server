@@ -42,7 +42,7 @@ public class CacheObserverManager {
         if (hasNoCachingEventListener(observationManager)) {
             EventListener listener = new CachingEventListener();
             observationManager.addEventListener(listener, org.apache.jackrabbit.spi.Event.ALL_TYPES,
-                    "/", true, null, null, true);
+                "/", true, null, null, true);
         }
     }
 
@@ -78,7 +78,7 @@ public class CacheObserverManager {
                         + "not initializing update notifier namespaces: " + e.getMessage());
             }
             observationManager.addEventListener(listener, org.apache.jackrabbit.spi.Event.ALL_TYPES,
-                    "/", true, null, null, true);
+                "/", true, null, null, true);
         }
     }
 
