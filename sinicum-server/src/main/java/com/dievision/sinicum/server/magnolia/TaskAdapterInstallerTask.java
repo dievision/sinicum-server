@@ -2,16 +2,14 @@ package com.dievision.sinicum.server.magnolia;
 
 import javax.jcr.RepositoryException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import info.magnolia.module.InstallContext;
-import info.magnolia.module.delta.Task;
-import info.magnolia.module.delta.TaskExecutionException;
-
 import com.dievision.sinicum.server.mgnlAdapters.ServerConfigurationAdapter5;
 import com.dievision.sinicum.server.mgnlAdapters.TaskAdapter;
 import com.dievision.sinicum.server.mgnlAdapters.TaskAdapterExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import info.magnolia.module.InstallContext;
+import info.magnolia.module.delta.Task;
+import info.magnolia.module.delta.TaskExecutionException;
 
 public class TaskAdapterInstallerTask implements Task {
     final TaskAdapter taskAdapter;

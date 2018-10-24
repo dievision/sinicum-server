@@ -15,7 +15,6 @@ import info.magnolia.rendering.renderer.Renderer;
 public class SinicumTemplateRenderer implements Renderer {
     private static final Logger logger = LoggerFactory.getLogger(SinicumTemplateRenderer.class);
 
-    @Override
     public void render(RenderingContext renderingContext, Map<String, Object> stringObjectMap)
         throws RenderException {
         // nothing

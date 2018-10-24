@@ -17,13 +17,6 @@ public class GlobalRepositoryStateTest {
     }
 
     @Test
-    public void testUpdateCacheKey() {
-        String keyDievision = GlobalRepositoryState.getCacheKey("dievision");
-        GlobalRepositoryState.updateCacheKey("dievision");
-        assertFalse(keyDievision.equals(GlobalRepositoryState.getCacheKey("dievision")));
-    }
-
-    @Test
     public void testDifferentCacheKeys() {
         String keyDievision = GlobalRepositoryState.getCacheKey("dievision");
         String keyCody = GlobalRepositoryState.getCacheKey("cody");

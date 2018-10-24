@@ -17,7 +17,6 @@ public class MgnlContextAdapter5 implements MgnlContextAdapterInterface {
     @Override
     public Collection<String> getUserRoles() {
         return MgnlContext.getUser().getRoles();
-
     }
 
     @Override

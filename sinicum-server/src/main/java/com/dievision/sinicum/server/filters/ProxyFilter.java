@@ -16,6 +16,7 @@ package com.dievision.sinicum.server.filters;
  * limitations under the License.
  */
 
+import com.dievision.sinicum.server.mgnlAdapters.AggregationStateAdapter;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -53,8 +54,6 @@ import java.util.BitSet;
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.regex.Pattern;
-
-import com.dievision.sinicum.server.mgnlAdapters.AggregationStateAdapter;
 
 /**
  * An HTTP reverse proxy/gateway servlet. It is designed to be extended for customization if

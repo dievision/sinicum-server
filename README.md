@@ -14,7 +14,7 @@ language-neutral and can potentially be used with any other client.
 
 ## Requirements
 
-Sinicum Server currently requires Magnolia CMS 5.2 or above.
+Sinicum Server currently requires Magnolia CMS 5.4 or above.
 
 
 ## Installation
@@ -26,8 +26,8 @@ include the following dependency:
 ```xml
 <dependency>
   <groupId>com.dievision.sinicum</groupId>
-  <artifactId>sinicum-server-magnolia-5</artifactId>
-  <version>0.11.3</version>
+  <artifactId>sinicum-server</artifactId>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -36,12 +36,19 @@ the list of your repositories:
 
 ```xml
 <repositories>
-  <repository>
-    <id>maven.dievision.de.releases</id>
-    <name>Dievision Maven Repository</name>
-    <url>https://mvn-dievision.s3.amazonaws.com/release</url>
-  </repository>
-</repositories>
+    <repository>
+      <id>dievision.magnolia.public</id>
+      <url>https://nexus.dievision.de/repository/magnolia-public/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
 ```
 
 If you use Sinicum Server in context of a Rails project, it is

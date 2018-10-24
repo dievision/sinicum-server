@@ -4,10 +4,10 @@ import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.RepositoryException;
 
+import com.dievision.sinicum.server.mgnlAdapters.ServerConfigurationAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.dievision.sinicum.server.mgnlAdapters.ServerConfigurationAdapter;
 import com.dievision.sinicum.server.mgnlAdapters.TaskAdapter;
 
 /**
